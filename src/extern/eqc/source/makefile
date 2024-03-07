@@ -2,7 +2,11 @@ CC = gcc
 CFLAGS := -I. -fPIC -Wall -std=c99 -O3
 INSTALL_DIR ?= $(HOME)/eqc
 
-all: thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o eqc.o
+.PHONY: objects all clean install
+
+objects: thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o eqc.o
+
+all: objects
 	$(CC) $(CFLAGS) -shared thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o eqc.o -lm -o libeqc.so
 	ar r libeqc.a thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o eqc.o
 	ranlib libeqc.a
