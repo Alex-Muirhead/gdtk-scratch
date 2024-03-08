@@ -1,0 +1,42 @@
+{
+  "authors": [
+    "GDTK Dev Group"
+  ],
+  "copyright": "Copyright © 2023, GDTK Dev Group",
+  "description": "Eilmer 5 Application",
+  "license": "GPL-3.0",
+  "name": "lmr",
+  "sourcePaths": ["."],
+  "importPaths": ["."],
+  "dependencies": {
+    "dyaml"     : { "path": "../extern/D-YAML" },
+    "gzip"      : { "path": "../extern/gzip" },
+    "gas"       : { "path": "../gas" },
+    "gasdyn"    : { "path": "../gasdyn" },  
+    "geom"      : { "path": "../geom" },
+    "grid_utils": { "path": "../grid_utils" },
+    "nm"        : { "path": "../nm" },
+    "ntypes"    : { "path": "../ntypes" },
+  },
+  "versions": [
+    "MHD",
+    "multi_T_gas",
+    "multi_species_gas", 
+    "newton_krylov", 
+    "turbulence" 
+  ],
+  "configurations": [
+    {
+      "name": "executable",
+      "targetType": "executable",
+      "importPaths": [".", ".."],
+      "mainSourceFile": "main.d",
+    },
+    {
+      "name": "library",
+      "targetType": "sourceLibrary",
+      "importPaths": ["."],
+      "excludedSourceFiles": ["main.d"]
+    }
+  ],
+}
