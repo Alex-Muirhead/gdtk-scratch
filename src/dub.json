@@ -11,6 +11,7 @@
     "./nm",
     "./ntypes",
     "./util",
+    "./radiation"
   ],
   "sourcePaths": ["."],
   "dependencies": {
@@ -23,5 +24,6 @@
     "gdtk:nm": "*",
     "gdtk:ntypes": "*",
     "gdtk:util": "*",
+    "gdtk:radiation": "*"
   }
 }
