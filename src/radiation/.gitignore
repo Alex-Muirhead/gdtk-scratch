@@ -1,0 +1,19 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/radiation
+radiation.so
+radiation.dylib
+radiation.dll
+radiation.a
+radiation.lib
+radiation-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst
+
+# Ignore solution files
+lmrsim/
