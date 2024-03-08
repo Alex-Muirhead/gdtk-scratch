@@ -12,7 +12,7 @@ ifeq ($(shell uname -s), Darwin)
 else
     PLATFORM := linux
 endif
-$(info PLATFORM=$(PLATFORM))
+# $(info PLATFORM=$(PLATFORM))
 
 WITH_DVODE ?= 0
 INSTALL_DIR ?= $(HOME)/gdtkinst
