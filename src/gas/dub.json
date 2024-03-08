@@ -7,20 +7,20 @@
 	"license": "GPL-3.0",
 	"name": "gas",
 	"sourcePaths": ["."],
-	"sourceFiles": ["libgasf.a", "../util/lua.d"],
+	"sourceFiles": ["../util/lua.d"],
+	"injectSourceFiles": ["ideal_air_fortran.o"],
 	"importPaths": [".", ".."],
-	"excludedSourceFiles": ["*demo.d"],
+	"excludedSourceFiles": ["*demo.d", "gas_calc.d", "gas_cwrap.d"],
 	"dflags": ["-dip1008", "-preview=in"],
 	"dependencies": {
 		"ceq": { "path": "../extern/ceq" },
-		"gasdyn": { "path": "../gasdyn" },
 		"kinetics": { "path": "../kinetics" },
 		"nm": { "path": "../nm" },
 		"util": { "path": "../util" }
 	},
 	"configurations": [
 		{
-			"name": "library"
+			"name": "library",
 		},
 		{
 			"name": "gascalc",
@@ -29,5 +29,5 @@
 			"mainSourceFile": "gas_calc.d"
 		},
 	],
-	"preGenerateCommands": ["make libgasf.a"]
+	"preGenerateCommands": ["make -s ideal_air_fortran.o"]
 }
