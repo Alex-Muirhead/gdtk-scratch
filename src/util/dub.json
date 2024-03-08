@@ -12,7 +12,7 @@
 	"injectSourceFiles": ["../../extern/lua-5.4.3/install/lib/liblua.a", "lua.d"],
 	"importPaths": [".", ".."],
 	"lflags": ["-L../../extern/lua-5.4.3/lib"],
-	"preGenerateCommands": ["make"],
+	"preGenerateCommands": ["make -s"],
 	"subPackages": [
 		{
 			"name": "lua-service",
@@ -21,7 +21,7 @@
 				"lua.d", "lua_service.d", 
 				"../../extern/lua-5.4.3/install/lib/liblua.a"
 			],
-			"preGenerateCommands": ["make"]
+			"preGenerateCommands": ["make -s"]
 		}
 	]
 }
