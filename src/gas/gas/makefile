@@ -15,7 +15,7 @@ endif
 # $(info PLATFORM=$(PLATFORM))
 
 INSTALL_DIR ?= $(HOME)/gdtkinst
-BUILD_DIR := ../../build
+BUILD_DIR := ../../../build
 
 DEMO_PROGRAMS := gas_model_demo ideal_gas_demo luagas_model_demo
 
@@ -37,33 +37,33 @@ TEST_PROGRAMS := chemkin_therm_cond_test chemkin_viscosity_test cea_therm_cond_t
 	vib_specific_co_mixture_test \
 	two_temperature_gasgiant_test multi_temperature_gas_test
 
-LUA_DIR := ../../extern/lua-5.4.3
+LUA_DIR := ../../../extern/lua-5.4.3
 LIBLUA := $(LUA_DIR)/install/lib/liblua.a
 LIBLUAPATH := $(LUA_DIR)/lib
 
-CEQ_DIR := ../extern/ceq/source
+CEQ_DIR := ../../extern/ceq/source
 LIBCEQ := $(CEQ_DIR)/libceq.a
 include $(CEQ_DIR)/ceq_files.mk
 
-NTYPES_DIR := ../ntypes
+NTYPES_DIR := ../../ntypes/ntypes
 NTYPES_FILES := $(NTYPES_DIR)/complex.d
 
-UTIL_DIR := ../util
+UTIL_DIR := ../../util/util
 include $(UTIL_DIR)/util_files.mk
 
-NM_DIR := ../nm
+NM_DIR := ../../nm/nm
 include $(NM_DIR)/nm_files.mk
 
-KINETICS_DIR := ../kinetics
+KINETICS_DIR := ../../kinetics/kinetics
 include $(KINETICS_DIR)/kinetics_files.mk
 
-GASDYN_DIR := ../gasdyn
+GASDYN_DIR := ../../gasdyn/gasdyn
 include $(GASDYN_DIR)/gasdyn_files.mk
 
-GEOM_DIR := ../geom
+GEOM_DIR := ../../geom/geom
 include $(GEOM_DIR)/geom_files.mk
 
-GZIP_DIR := ../extern/gzip
+GZIP_DIR := ../../extern/gzip
 GZIP_FILES := $(GZIP_DIR)/gzip.d
 
 include gas_files.mk
