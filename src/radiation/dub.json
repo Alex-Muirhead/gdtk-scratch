@@ -1,13 +1,17 @@
 {
-	"authors": [
-		"Alex Muirhead"
-	],
-	"copyright": "Copyright © 2024, Alex Muirhead",
-	"description": "Radiation Transport Sovler",
-	"license": "GPL-3.0",
-	"name": "radiation",
-	"importPaths": ["source", "../lmr"],
-	"dependencies": {
-		"lmr": { "path": "../lmr" },
-	}
+  "authors": [
+    "Alex Muirhead"
+  ],
+  "copyright": "Copyright © 2024, Alex Muirhead",
+  "description": "Radiation Transport Sovler",
+  "license": "GPL-3.0",
+  "name": "radiation",
+  "targetName": "radiation",
+  "dependencies": {
+    "gdtk:lmr": { "path": ".." },
+  },
+  "toolchainRequirements": {
+    "dmd": ">=2.107",
+    "ldc": "~>1.30"
+  }
 }

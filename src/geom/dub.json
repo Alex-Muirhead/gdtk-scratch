@@ -7,22 +7,22 @@
 	"license": "GPL-3.0",
 	"name": "geom",
 	"sourcePaths": ["."],
-	"importPaths": [".", ".."],
-	"excludedSourceFiles": ["*demo.d"], 
+	"importPaths": ["."],
+	"excludedSourceFiles": ["geom/*demo.d"], 
 	"dflags": ["-dip1008", "-preview=in"],
 	"dependencies": {
-		"util": { "path": "../util" },
 		"gzip": { "path": "../extern/gzip" },
-		"nm": { "path": "../nm" }
+		"gdtk:util": { "path": ".." },
+		"gdtk:nm"  : { "path": ".." }
 	}, 
 	"configurations": [
 		{
 			"name": "library",
 			"excludedSourceFiles": [
-				"misc/drifting_eye.d", 
-				"misc/rotating_a.d",
-				"misc/libplot.d", 
-				"foamMesh.d"
+				"geom/misc/drifting_eye.d", 
+				"geom/misc/rotating_a.d",
+				"geom/misc/libplot.d", 
+				"geom/foamMesh.d"
 			]
 		}
 	]

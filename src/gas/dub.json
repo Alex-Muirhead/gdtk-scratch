@@ -7,16 +7,15 @@
 	"license": "GPL-3.0",
 	"name": "gas",
 	"sourcePaths": ["."],
-	"sourceFiles": ["../util/lua.d"],
-	"injectSourceFiles": ["ideal_air_fortran.o"],
-	"importPaths": [".", ".."],
-	"excludedSourceFiles": ["*demo.d", "gas_calc.d", "gas_cwrap.d"],
+	"importPaths": ["."],
+	"injectSourceFiles": ["gas/ideal_air_fortran.o"],
+	"excludedSourceFiles": ["gas/*demo.d", "gas/gas_calc.d", "gas/gas_cwrap.d"],
 	"dflags": ["-dip1008", "-preview=in"],
 	"dependencies": {
 		"ceq": { "path": "../extern/ceq" },
-		"kinetics": { "path": "../kinetics" },
-		"nm": { "path": "../nm" },
-		"util": { "path": "../util" }
+		"gdtk:kinetics": { "path": ".." },
+		"gdtk:nm"      : { "path": ".." },
+		"gdtk:util"    : { "path": ".." }
 	},
 	"configurations": [
 		{
@@ -29,5 +28,5 @@
 			"mainSourceFile": "gas_calc.d"
 		},
 	],
-	"preGenerateCommands": ["make -s ideal_air_fortran.o"]
+	"preGenerateCommands": ["cd gas && make -s ideal_air_fortran.o"]
 }
