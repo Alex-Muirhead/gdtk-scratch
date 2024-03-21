@@ -7,8 +7,8 @@
 	"license": "GPL-3.0",
 	"name": "grid_utils",
 	"sourcePaths": ["."],
-	"importPaths": [".", ".."],
-	"excludedSourceFiles": ["ugrid_partition.d"],
+	"importPaths": ["."],
+	"excludedSourceFiles": ["grid_utils/ugrid_partition.d"],
 	"configurations": [
 		{
 			"name": "library",
