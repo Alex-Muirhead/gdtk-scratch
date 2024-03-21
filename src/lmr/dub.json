@@ -11,12 +11,12 @@
   "dependencies": {
     "dyaml"     : { "path": "../extern/D-YAML" },
     "gzip"      : { "path": "../extern/gzip" },
-    "gas"       : { "path": "../gas" },
-    "gasdyn"    : { "path": "../gasdyn" },  
-    "geom"      : { "path": "../geom" },
-    "grid_utils": { "path": "../grid_utils" },
-    "nm"        : { "path": "../nm" },
-    "ntypes"    : { "path": "../ntypes" },
+    "gdtk:gas"       : { "path": ".." },
+    "gdtk:gasdyn"    : { "path": ".." },  
+    "gdtk:geom"      : { "path": ".." },
+    "gdtk:grid_utils": { "path": ".." },
+    "gdtk:nm"        : { "path": ".." },
+    "gdtk:ntypes"    : { "path": ".." },
   },
   "versions": [
     "MHD",
@@ -29,14 +29,12 @@
     {
       "name": "executable",
       "targetType": "executable",
-      "importPaths": [".", ".."],
-      "mainSourceFile": "main.d",
+      "mainSourceFile": "lmr/main.d",
     },
     {
       "name": "library",
       "targetType": "sourceLibrary",
-      "importPaths": ["."],
-      "excludedSourceFiles": ["main.d"]
+      "excludedSourceFiles": ["lmr/main.d"]
     }
   ],
 }

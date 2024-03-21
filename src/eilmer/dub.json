@@ -8,14 +8,14 @@
 	"name": "eilmer",
 	"targetType": "executable",
 	"sourcePaths": ["."],
-	"importPaths": [".", ".."],
+	"importPaths": ["."],
 	"dependencies": {
 		"ceq": { "path": "../extern/ceq" },
-		"util": { "path": "../util" },
-		"geom": { "path": "../geom" },
-		"gzip": { "path": "../extern/gzip" },
-		"gasdyn": { "path": "../gasdyn" },
-		"grid_utils": { "path": "../grid_utils" }
+		"gdtk:util": { "path": ".." },
+		"gdtk:geom": { "path": ".." },
+		"gdtk:gzip": { "path": ".." },
+		"gdtk:gasdyn": { "path": ".." },
+		"gdtk:grid_utils": { "path": ".." }
 	},
 	"excludedSourceFiles": [
 		"cht_accelerator.d",
