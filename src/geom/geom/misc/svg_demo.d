@@ -8,7 +8,7 @@
  */
 
 import std.stdio;
-import misc.svg;
+import geom.misc.svg;
 
 void main()
 {

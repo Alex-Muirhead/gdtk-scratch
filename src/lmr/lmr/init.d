@@ -25,7 +25,7 @@ import util.lua;
 import util.lua_service;
 import lua_helper;
 
-import json_helper;
+import util.json_helper;
 import lmrexceptions : LmrException;
 import lmrconfig;
 import globalconfig;
