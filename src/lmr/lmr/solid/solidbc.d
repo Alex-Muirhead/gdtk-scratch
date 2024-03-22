@@ -4,7 +4,7 @@
  * Author: Rowan G. and Peter J.
  */
 
-module solidbc;
+module lmr.solid.solidbc;
 
 import std.json;
 import std.conv;
@@ -12,15 +12,15 @@ import std.conv;
 import util.lua;
 import geom;
 import util.json_helper;
-import solid_ghost_cell;
-import solid_boundary_interface_effect;
-import solid_boundary_flux_effect;
-import ssolidblock;
-import globaldata;
+import lmr.solid.solid_ghost_cell;
+import lmr.solid.solid_boundary_interface_effect;
+import lmr.solid.solid_boundary_flux_effect;
+import lmr.solid.ssolidblock;
+import lmr.globaldata;
 import lmr.fluidfvcell;
 import lmr.coredata;
-import solidfvcell;
-import solidfvinterface;
+import lmr.solid.solidfvcell;
+import lmr.solid.solidfvinterface;
 
 SolidBoundaryCondition makeSolidBCFromJson(JSONValue jsonData, int blk_id, int boundary,
                                            size_t nicell, size_t njcell, size_t nkcell)

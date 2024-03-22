@@ -8,7 +8,7 @@
 module grid_deform;
 
 import std.stdio;
-import fluidblock;
+import lmr.fluidblock;
 import std.math;
 import std.algorithm;
 import ntypes.complex;

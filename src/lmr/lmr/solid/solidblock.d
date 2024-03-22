@@ -13,20 +13,20 @@
  * Kyle A. Damm 2020-02-11
  */
 
-module solidblock;
+module lmr.solid.solidblock;
 
 import std.json;
 import std.conv;
 
 import util.lua;
 import geom;
-import globaldata;
-import globalconfig;
-import solidfvcell;
-import solidfvinterface;
-import solidbc;
-import block;
-import jacobian;
+import lmr.globaldata;
+import lmr.globalconfig;
+import lmr.solid.solidfvcell;
+import lmr.solid.solidfvinterface;
+import lmr.solid.solidbc;
+import lmr.block;
+import lmr.jacobian;
 
 import nm.number;
 import ntypes.complex;

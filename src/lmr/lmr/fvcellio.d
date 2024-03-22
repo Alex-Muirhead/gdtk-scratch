@@ -5,7 +5,7 @@
  * Date: 2023-06-20
  */
 
-module fvcellio;
+module lmr.fvcellio;
 
 import std.stdio;
 import std.algorithm : findSplit, canFind, startsWith;
@@ -17,12 +17,12 @@ import std.range.primitives : front, popFront;
 import nm.number;
 import ntypes.complex;
 
-import globalconfig;
-import lmrexceptions : LmrException;
+import lmr.globalconfig;
+import lmr.exceptions : LmrException;
 import lmr.fluidfvcell : FluidFVCell;
 import lmr.fvcell : FVCell;
-import solidfvcell : SolidFVCell;
-import flowstate : FlowState;
+import lmr.solid.solidfvcell : SolidFVCell;
+import lmr.flowstate : FlowState;
 import geom : Grid_t, Vector3;
 
 enum FieldVarsType { fluid, solid, limiter, residual, gradient };

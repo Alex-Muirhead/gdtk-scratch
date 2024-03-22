@@ -5,7 +5,7 @@
  * Date: 2024-03-01, adapted from probeflow.d and src/eilmer/postprocess.d
  */
 
-module sliceflow;
+module lmr.commands.sliceflow;
 
 import std.stdio;
 import std.file;
@@ -18,14 +18,14 @@ import std.conv : to;
 import std.range;
 import std.algorithm;
 
-import globalconfig;
-import fileutil;
-import flowsolution;
-import lmrconfig : lmrCfg;
-import init : initConfiguration;
-import cmdhelper;
+import lmr.globalconfig;
+import lmr.fileutil;
+import lmr.flowsolution;
+import lmr.config : lmrCfg;
+import lmr.init : initConfiguration;
+import lmr.commands.cmdhelper;
 
-import command;
+import lmr.commands.command;
 
 Command sliceFlowCmd;
 

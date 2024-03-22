@@ -7,7 +7,7 @@
  * Date: 2023-11-29
  */
 
-module structured2unstructured;
+module lmr.commands.structured2unstructured;
 
 import std.getopt;
 import std.stdio : writeln, writefln, File;
@@ -19,8 +19,8 @@ import std.file : rename, exists, rmdirRecurse, mkdirRecurse;
 import geom;
 import bc;
 
-import lmrconfig;
-import command;
+import lmr.config;
+import lmr.commands.command;
 import util.json_helper : readJSONfile;
 
 

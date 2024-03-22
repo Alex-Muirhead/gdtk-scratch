@@ -8,7 +8,7 @@
  *                 to better reflect its more general role
  */
 
-module prepsim;
+module lmr.commands.prepsim;
 
 import core.stdc.stdlib : system;
 import std.getopt;
@@ -29,11 +29,11 @@ import nm.luabbla;
 
 import util.json_helper;
 import lua_helper : initLuaStateForPrep;
-import lmrconfig : lmrCfg;
-import command;
-import globalconfig;
-import luaflowsolution;
-import luaflowstate;
+import lmr.config : lmrCfg;
+import lmr.commands.command;
+import lmr.globalconfig;
+import lmr.luawrap.luaflowsolution;
+import lmr.luawrap.luaflowstate;
 import gasdyn.luaidealgasflow;
 import gasdyn.luagasflow;
 

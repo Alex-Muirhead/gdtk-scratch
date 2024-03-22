@@ -5,14 +5,14 @@
  * Date: 2022-08-08
  */
 
-module revisionid;
+module lmr.commands.revisionid;
 
 import std.stdio;
 import std.getopt;
 import std.string;
 
-import lmrconfig;
-import command;
+import lmr.config;
+import lmr.commands.command;
 
 Command revisionIdCmd;
 string cmdName = "revision-id";

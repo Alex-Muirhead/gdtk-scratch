@@ -15,7 +15,7 @@
  *   2024-02-11: Moved to lmr5, introduced solver_mode as config option.
  */
 
-module globalconfig;
+module lmr.globalconfig;
 
 import std.conv;
 import std.stdio;
@@ -44,22 +44,22 @@ version (opencl_gpu_chem) {
 version (cuda_gpu_chem) {
      import cuda_gpu_chem;
 }
-import lmrconfig;
+import lmr.config;
 import util.json_helper;
-import globaldata;
-import flowstate;
-import conservedquantities;
-import fluidblock;
-import fluidblockarray;
-import sfluidblock: SFluidBlock;
-import ufluidblock: UFluidBlock;
-import ssolidblock;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.conservedquantities;
+import lmr.fluidblock;
+import lmr.fluidblockarray;
+import lmr.sfluidblock: SFluidBlock;
+import lmr.ufluidblock: UFluidBlock;
+import lmr.solid.ssolidblock;
 import bc;
-import user_defined_source_terms;
-import solid_udf_source_terms;
-import grid_motion;
-import grid_motion_udf;
-import mass_diffusion;
+import lmr.user_defined_source_terms;
+import lmr.solid.solid_udf_source_terms;
+import lmr.grid_motion;
+import lmr.grid_motion_udf;
+import lmr.mass_diffusion;
 import turbulence;
 version(FSI) { import fsi; }
 

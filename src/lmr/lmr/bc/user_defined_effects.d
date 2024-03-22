@@ -27,15 +27,15 @@ import gas.luagas_model;
 import gas.gas_state;
 
 import geom;
-import simcore;
-import flowstate;
+import lmr.simcore;
+import lmr.flowstate;
 import lmr.fluidfvcell;
-import fvinterface;
-import sfluidblock: SFluidBlock;
-import sfluidblock : cell_index_to_logical_coordinates;
-import globalconfig;
-import globaldata;
-import luaflowstate;
+import lmr.fvinterface;
+import lmr.sfluidblock: SFluidBlock;
+import lmr.sfluidblock : cell_index_to_logical_coordinates;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.luawrap.luaflowstate;
 import bc;
 
 class UserDefinedGhostCell : GhostCellEffect {

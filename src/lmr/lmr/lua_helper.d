@@ -26,19 +26,19 @@ import nm.luabbla;
 import geom: gridTypeName, Grid_t;
 
 import lmr.fluidfvcell;
-import fvinterface;
-import luaflowstate;
-import luaflowsolution;
+import lmr.fvinterface;
+import lmr.luawrap.luaflowstate;
+import lmr.luawrap.luaflowsolution;
 import gasdyn.luaidealgasflow;
 import gasdyn.luagasflow;
-import globalconfig;
-import globaldata;
-import solidfvcell;
-import ssolidblock;
-import sfluidblock;
-import ufluidblock;
-import fluidblock;
-import blockio : luafn_writeFluidMetadata,
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.solid.solidfvcell;
+import lmr.solid.ssolidblock;
+import lmr.sfluidblock;
+import lmr.ufluidblock;
+import lmr.fluidblock;
+import lmr.blockio : luafn_writeFluidMetadata,
     luafn_writeInitialFluidFile,
     luafn_writeSolidMetadata,
     luafn_writeInitialSolidFile;

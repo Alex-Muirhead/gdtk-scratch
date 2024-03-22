@@ -5,7 +5,7 @@
  * Date: 2024-03-04, adapted from sliceflow.d and src/eilmer/postprocess.d
  */
 
-module extractline;
+module lmr.commands.extractline;
 
 import std.stdio;
 import std.file;
@@ -19,14 +19,14 @@ import std.range;
 import std.algorithm;
 
 import geom : Vector3;
-import globalconfig;
-import fileutil;
-import flowsolution;
-import lmrconfig : lmrCfg;
-import init : initConfiguration;
-import cmdhelper;
+import lmr.globalconfig;
+import lmr.fileutil;
+import lmr.flowsolution;
+import lmr.config : lmrCfg;
+import lmr.init : initConfiguration;
+import lmr.commands.cmdhelper;
 
-import command;
+import lmr.commands.command;
 
 Command extractLineCmd;
 

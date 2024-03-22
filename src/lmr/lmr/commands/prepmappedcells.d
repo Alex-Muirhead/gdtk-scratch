@@ -5,7 +5,7 @@
  * Date: 2023-11-18
  */
 
-module prepmappedcells;
+module lmr.commands.prepmappedcells;
 
 import std.getopt;
 import std.stdio : writeln, writefln, File;
@@ -14,12 +14,12 @@ import std.conv : to;
 import std.path : dirName;
 import std.file : thisExePath;
 
-import lmrconfig : lmrCfg;
-import command;
-import globalconfig;
-import globaldata;
-import fluidblock;
-import init;
+import lmr.config : lmrCfg;
+import lmr.commands.command;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.fluidblock;
+import lmr.init;
 import geom;
 import bc;
 

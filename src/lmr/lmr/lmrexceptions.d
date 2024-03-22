@@ -11,7 +11,7 @@
  *
  */
 
-module lmrexceptions;
+module lmr.exceptions;
 
 /**
  * Base Eilmer exception.

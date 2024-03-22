@@ -1,4 +1,4 @@
-module solid_boundary_interface_effect;
+module lmr.solid.solid_boundary_interface_effect;
 
 import std.stdio;
 import std.json;
@@ -9,15 +9,15 @@ import std.math;
 import ntypes.complex;
 import nm.number;
 
-import simcore;
+import lmr.simcore;
 import util.json_helper;
 import geom;
-import globaldata;
-import globalconfig;
-import solidfvinterface;
-import ssolidblock;
-import solidfvcell;
-import solidbc;
+import lmr.globaldata;
+import lmr.globalconfig;
+import lmr.solid.solidfvinterface;
+import lmr.solid.ssolidblock;
+import lmr.solid.solidfvcell;
+import lmr.solid.solidbc;
 
 SolidBoundaryInterfaceEffect makeSolidBIEfromJson(JSONValue jsonData, int blk_id, int boundary)
 {

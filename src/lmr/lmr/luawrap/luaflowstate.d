@@ -6,7 +6,7 @@
  * Version: Initial cut.
  */
 
-module luaflowstate;
+module lmr.luawrap.luaflowstate;
 
 import std.algorithm;
 import std.array;
@@ -23,10 +23,10 @@ import nm.number;
 
 import gas;
 import gas.luagas_model;
-import flowstate;
+import lmr.flowstate;
 import geom;
 import geom.luawrap;
-import globalconfig;
+import lmr.globalconfig;
 
 // Name for FlowState objects in Lua scripts are a pure Lua play,
 // however, we wish to provide a few FlowState-related functions

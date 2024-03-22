@@ -2,7 +2,7 @@
 // Class for unstructured blocks of cells, for use within Eilmer4.
 // Peter J. 2014-11-07 first serious cut.
 
-module ufluidblock;
+module lmr.ufluidblock;
 
 import std.conv;
 import std.file;
@@ -24,24 +24,24 @@ import gzip;
 import geom;
 import gas;
 import kinetics;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fluxcalc;
-import flowgradients;
-import fvvertex;
-import fvinterface;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fluxcalc;
+import lmr.flowgradients;
+import lmr.fvvertex;
+import lmr.fvinterface;
 import lmr.fluidfvcell : FluidFVCell;
 import lmr.coredata;
-import lsqinterp;
-import fluidblock;
+import lmr.lsqinterp;
+import lmr.fluidblock;
 import bc;
-import grid_motion;
-import grid_motion_udf;
+import lmr.grid_motion;
+import lmr.grid_motion_udf;
 import geom.luawrap.luausgrid;
-import luaflowstate;
+import lmr.luawrap.luaflowstate;
 import nm;
-import block;
+import lmr.block;
 
 class UFluidBlock: FluidBlock {
 public:

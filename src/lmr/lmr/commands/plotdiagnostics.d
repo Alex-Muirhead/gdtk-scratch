@@ -17,7 +17,7 @@ import std.process : environment, executeShell;
 import std.file : copy;
 import lmr.lmrerrors;
 
-import command;
+import lmr.commands.command;
 
 Command plotDiagnosticsCmd;
 string cmdName = "plot-diagnostics";

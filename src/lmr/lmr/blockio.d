@@ -5,7 +5,7 @@
  * Date: 2023-06-21
  */
 
-module blockio;
+module lmr.blockio;
 
 immutable string BLK_IO_VERSION = "1.0";
 
@@ -21,19 +21,19 @@ import util.lua;
 import nm.number;
 import geom.luawrap;
 
-import lmrexceptions : LmrException;
-import globalconfig : GlobalConfig;
-import lmrconfig;
+import lmr.exceptions : LmrException;
+import lmr.globalconfig : GlobalConfig;
+import lmr.config;
 import lmr.fvcell : FVCell;
-import fvcellio;
-import fluidblock : FluidBlock;
-import sfluidblock : SFluidBlock;
-import ufluidblock : UFluidBlock;
-import flowsolution : FluidBlockLite;
-import solidblock : SolidBlock;
-import ssolidblock : SSolidBlock;
-import solidsolution : SolidBlockLite;
-import globaldata : fluidBlkIO, solidBlkIO;
+import lmr.fvcellio;
+import lmr.fluidblock : FluidBlock;
+import lmr.sfluidblock : SFluidBlock;
+import lmr.ufluidblock : UFluidBlock;
+import lmr.flowsolution : FluidBlockLite;
+import lmr.solid.solidblock : SolidBlock;
+import lmr.solid.ssolidblock : SSolidBlock;
+import lmr.solid.solidsolution : SolidBlockLite;
+import lmr.globaldata : fluidBlkIO, solidBlkIO;
 
 class BlockIO {
 public:

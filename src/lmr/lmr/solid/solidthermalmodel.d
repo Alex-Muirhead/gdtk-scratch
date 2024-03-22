@@ -28,8 +28,8 @@ import ntypes.complex;
 
 import lmr.solid.solidstate : SolidState;
 
-import lmrexceptions;
-import lmr.lmrerrors;
+import lmr.exceptions;
+import lmr.errors;
 
 
 interface SolidThermalModel

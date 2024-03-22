@@ -2,7 +2,7 @@
 // Least-squares interpolation/reconstruction of flow field.
 //
 
-module lsqinterp;
+module lmr.lsqinterp;
 
 import std.math;
 import std.stdio;
@@ -15,9 +15,9 @@ import nm.limiters;
 
 import geom;
 import gas;
-import globalconfig;
-import flowstate;
-import fvinterface;
+import lmr.globalconfig;
+import lmr.flowstate;
+import lmr.fvinterface;
 import lmr.fluidfvcell;
 
 immutable size_t cloud_nmax = 112; // ??? WHY? [TODO] Add some comment for this selection please

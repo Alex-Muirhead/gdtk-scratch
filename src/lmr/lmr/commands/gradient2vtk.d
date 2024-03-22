@@ -5,7 +5,7 @@
  * Date: 2024-08-01
  */
 
-module gradient2vtk;
+module lmr.commands.gradient2vtk;
 
 import std.stdio;
 import std.file;
@@ -18,16 +18,16 @@ import std.stdint;
 import std.algorithm.mutation : remove;
 
 import geom;
-import globalconfig;
-import fileutil;
-import flowsolution;
-import lmrconfig;
-import init : initConfiguration;
-import vtk_writer;
-import cmdhelper;
-import blockio;
+import lmr.globalconfig;
+import lmr.fileutil;
+import lmr.flowsolution;
+import lmr.config;
+import lmr.init : initConfiguration;
+import lmr.vtk_writer;
+import lmr.commands.cmdhelper;
+import lmr.blockio;
 
-import command;
+import lmr.commands.command;
 
 Command gradient2vtkCmd;
 string cmdName = "gradient2vtk";

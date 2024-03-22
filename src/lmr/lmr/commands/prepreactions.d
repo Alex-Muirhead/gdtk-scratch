@@ -24,8 +24,8 @@ version(macosx) {
 
 import util.lua;
 
-import command;
-import lmrexceptions : LmrPreProcessingException;
+import lmr.commands.command;
+import lmr.exceptions : LmrPreProcessingException;
 
 Command prepReacCmd;
 string cmdName = "prep-reactions";

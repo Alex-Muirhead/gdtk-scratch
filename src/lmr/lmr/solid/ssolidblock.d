@@ -5,7 +5,7 @@
  * Version: 2015-22-04
  */
 
-module ssolidblock;
+module lmr.solid.ssolidblock;
 
 import std.stdio;
 import std.string : toStringz;
@@ -27,17 +27,17 @@ import util.json_helper;
 import lua_helper;
 import gzip;
 import geom;
-import globalconfig;
-import globaldata : dedicatedConfig;
-import fluidblock;
-import sfluidblock;
-import solidblock;
-import solidfvcell;
-import solidfvinterface;
-import solidfvvertex;
-import solidbc;
-import block;
-import jacobian;
+import lmr.globalconfig;
+import lmr.globaldata : dedicatedConfig;
+import lmr.fluidblock;
+import lmr.sfluidblock;
+import lmr.solid.solidblock;
+import lmr.solid.solidfvcell;
+import lmr.solid.solidfvinterface;
+import lmr.solid.solidfvvertex;
+import lmr.solid.solidbc;
+import lmr.block;
+import lmr.jacobian;
 
 import lmr.solid.solidthermalmodel;
 
