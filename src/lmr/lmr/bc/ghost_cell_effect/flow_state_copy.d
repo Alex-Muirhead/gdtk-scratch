@@ -10,13 +10,13 @@ import std.math;
 
 import nm.number;
 import geom;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fvinterface;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fvinterface;
 import lmr.fluidfvcell;
-import fluidblock;
-import sfluidblock;
+import lmr.fluidblock;
+import lmr.sfluidblock;
 import gas;
 import bc;
 

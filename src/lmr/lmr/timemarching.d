@@ -7,7 +7,7 @@
  *   2024-02-07
  */
 
-module timemarching;
+module lmr.timemarching;
 
 import std.stdio : write, writeln, writefln, stdout, File;
 import std.datetime : DateTime, Clock;
@@ -26,8 +26,8 @@ import dyaml;
 import ntypes.complex;
 import util.time_utils : timeStringToSeconds;
 import nm.number : number;
-import conservedquantities : new_ConservedQuantities;
-import simcore : check_run_time_configuration,
+import lmr.conservedquantities : new_ConservedQuantities;
+import lmr.simcore : check_run_time_configuration,
        synchronize_corner_coords_for_all_blocks,
        call_UDF_at_timestep_start,
        call_UDF_at_timestep_end,
@@ -38,7 +38,7 @@ import simcore : check_run_time_configuration,
        compute_Linf_residuals,
        compute_L2_residual,
        compute_mass_balance;
-import simcore_gasdynamic_step : sts_gasdynamic_explicit_increment_with_fixed_grid,
+import lmr.simcore_gasdynamic_step : sts_gasdynamic_explicit_increment_with_fixed_grid,
        gasdynamic_explicit_increment_with_fixed_grid,
        gasdynamic_implicit_increment_with_fixed_grid,
        gasdynamic_explicit_increment_with_moving_grid,
@@ -48,15 +48,15 @@ import simcore_gasdynamic_step : sts_gasdynamic_explicit_increment_with_fixed_gr
        local_dt_allow_parab,
        local_cfl_max,
        local_invalid_cell_count;
-import simcore_solid_step : determine_solid_time_step_size, solid_step;
+import lmr.simcore_solid_step : determine_solid_time_step_size, solid_step;
 
-import lmrexceptions;
-import lmrconfig;
+import lmr.exceptions;
+import lmr.config;
 
-import globalconfig;
-import globaldata;
-import init;
-import fileutil : ensure_directory_is_present;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.init;
+import lmr.fileutil : ensure_directory_is_present;
 import lmr.loads : computeRunTimeLoads,
        init_current_loads_indx_dir,
        wait_for_current_indx_dir,

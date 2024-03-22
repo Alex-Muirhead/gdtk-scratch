@@ -5,7 +5,7 @@
  * Started: 2021-05-24
  */
 
-module efieldbc;
+module lmr.efield.efieldbc;
 
 import std.stdio;
 import std.math;
@@ -14,11 +14,11 @@ import std.conv;
 import std.json;
 
 import lmr.fluidfvcell;
-import fvinterface;
+import lmr.fvinterface;
 import geom;
 import util.json_helper;
 import nm.number;
-import efieldconductivity;
+import lmr.efield.efieldconductivity;
 import bc.boundary_condition;
 import bc.ghost_cell_effect.full_face_copy;
 

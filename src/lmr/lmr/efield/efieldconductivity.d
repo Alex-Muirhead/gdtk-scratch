@@ -5,7 +5,7 @@
  * Version: 2021-05-24
  */
 
-module efieldconductivity;
+module lmr.efield.efieldconductivity;
 
 import std.stdio;
 import std.format;
@@ -14,7 +14,7 @@ import std.conv;
 
 import geom;
 import nm.number;
-import mass_diffusion;
+import lmr.mass_diffusion;
 import gas.gas_state;
 import gas.gas_model;
 import gas.physical_constants;

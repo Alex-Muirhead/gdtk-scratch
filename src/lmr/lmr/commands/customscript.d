@@ -7,7 +7,7 @@
  *   2024-02-26 -- Ported from eilmer4 by Nick
  */
 
-module customscript;
+module lmr.commands.customscript;
 
 import std.getopt;
 import std.stdio : writeln, writefln;
@@ -27,14 +27,14 @@ import nm.luabbla;
 
 import util.json_helper;
 import lua_helper : initLuaStateForPrep;
-import lmrconfig : lmrCfg;
-import command;
-import globalconfig;
-import luaflowsolution;
-import luaflowstate;
+import lmr.config : lmrCfg;
+import lmr.commands.command;
+import lmr.globalconfig;
+import lmr.luawrap.luaflowsolution;
+import lmr.luawrap.luaflowstate;
 import gasdyn.luaidealgasflow;
 import gasdyn.luagasflow;
-import blockio : luafn_writeFluidMetadata, luafn_writeInitialFluidFile;
+import lmr.blockio : luafn_writeFluidMetadata, luafn_writeInitialFluidFile;
 
 Command customScriptCmd;
 string cmdName = "custom-script";

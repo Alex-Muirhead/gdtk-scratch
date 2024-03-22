@@ -5,7 +5,7 @@
  * Version: 2015-22-04
  */
 
-module solidprops;
+module lmr.solid.solidprops;
 
 import std.stdio;
 import std.array;
@@ -18,8 +18,8 @@ import util.lua_service : getDouble, getDoubleWithDefault;
 
 import util.json_helper;
 import geom;
-import globalconfig;
-import solidfvcell;
+import lmr.globalconfig;
+import lmr.solid.solidfvcell;
 
 struct SolidProps {
 public:

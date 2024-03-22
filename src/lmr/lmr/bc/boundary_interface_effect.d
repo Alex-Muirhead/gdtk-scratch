@@ -20,19 +20,19 @@ import nm.bracketing;
 
 import geom;
 import util.json_helper;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fvinterface;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fvinterface;
 import lmr.fluidfvcell;
-import fluidblock;
-import sfluidblock;
+import lmr.fluidblock;
+import lmr.sfluidblock;
 import gas;
 import bc;
-import solidfvcell;
-import solidfvinterface;
+import lmr.solid.solidfvcell;
+import lmr.solid.solidfvinterface;
 import kinetics.equilibrium_update;
-import mass_diffusion;
+import lmr.mass_diffusion;
 
 BoundaryInterfaceEffect make_BIE_from_json(JSONValue jsonData, int blk_id, int boundary)
 {

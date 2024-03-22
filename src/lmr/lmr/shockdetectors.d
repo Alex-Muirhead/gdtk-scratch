@@ -2,17 +2,17 @@
 // Prototyping for modular shock detection
 // @author: Nick Gibbons (n.gibbons@uq.edu.au)
 
-module shockdetectors;
+module lmr.shockdetectors;
 
 import std.conv;
 import std.math;
 import std.stdio;
 
-import globalconfig;
+import lmr.globalconfig;
 import gas;
 import geom;
-import flowstate;
-import fvinterface;
+import lmr.flowstate;
+import lmr.fvinterface;
 import nm.number;
 import ntypes.complex;
 import std.algorithm;

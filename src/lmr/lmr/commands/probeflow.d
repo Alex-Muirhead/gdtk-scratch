@@ -5,7 +5,7 @@
  * Date: 2024-02-18, adapted from computenorms.d and src/eilmer/postprocess.d
  */
 
-module probeflow;
+module lmr.commands.probeflow;
 
 import std.stdio;
 import std.file;
@@ -21,14 +21,14 @@ import std.string;
 import std.regex;
 import std.uni;
 
-import globalconfig;
-import fileutil;
-import flowsolution;
-import lmrconfig : lmrCfg;
-import init : initConfiguration;
-import cmdhelper;
+import lmr.globalconfig;
+import lmr.fileutil;
+import lmr.flowsolution;
+import lmr.config : lmrCfg;
+import lmr.init : initConfiguration;
+import lmr.commands.cmdhelper;
 
-import command;
+import lmr.commands.command;
 
 Command probeFlowCmd;
 

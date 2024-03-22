@@ -11,13 +11,13 @@ module bc.boundary_cell_effect;
 import std.json;
 import std.string;
 
-import globalconfig: FlowSolverException;
+import lmr.globalconfig: FlowSolverException;
 import lmr.fluidfvcell;
-import fvinterface;
+import lmr.fvinterface;
 import geom;
-import fluidblock;
-import sfluidblock: SFluidBlock;
-import globaldata;
+import lmr.fluidblock;
+import lmr.sfluidblock: SFluidBlock;
+import lmr.globaldata;
 import util.json_helper;
 import bc;
 

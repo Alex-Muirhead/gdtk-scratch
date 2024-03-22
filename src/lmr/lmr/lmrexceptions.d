@@ -2,7 +2,7 @@
  * Module to hold Eilmer-specific exceptions.
  */
 
-module lmrexceptions;
+module lmr.exceptions;
 
 /**
  * Base Eilmer exception.

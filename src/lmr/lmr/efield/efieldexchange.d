@@ -5,16 +5,16 @@
  * Version: 2021-08-03: Prototyping
  */
 
-module efieldexchange;
+module lmr.efield.efieldexchange;
 
 import std.stdio;
 import std.math;
 import std.algorithm;
 import std.conv;
 
-import fvinterface;
+import lmr.fvinterface;
 import geom;
-import efieldbc;
+import lmr.efield.efieldbc;
 
 version(mpi_parallel){
 import mpi;

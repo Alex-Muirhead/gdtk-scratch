@@ -8,16 +8,16 @@ import std.math;
 import std.stdio;
 import std.string;
 import std.json;
-import flowstate;
-import flowgradients;
+import lmr.flowstate;
+import lmr.flowgradients;
 import gas;
 import util.json_helper;
 import nm.number;
 import ntypes.complex;
-import globalconfig;
+import lmr.globalconfig;
 import geom;
 import lmr.fluidfvcell;
-import fvinterface;
+import lmr.fvinterface;
 
 /*
 Abstract base class defines functions all turbulence models must have:

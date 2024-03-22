@@ -1,6 +1,6 @@
 // solid_ghost_cell.d
 
-module solid_ghost_cell;
+module lmr.solid.solid_ghost_cell;
 
 import std.json;
 import std.string;
@@ -13,17 +13,17 @@ version(mpi_parallel) {
     import mpi;
 }
 
-import simcore;
+import lmr.simcore;
 import util.json_helper;
 import geom;
-import globaldata;
-import globalconfig;
-import solidfvinterface;
-import ssolidblock;
-import solidfvcell;
-import solidbc;
-import solid_full_face_copy;
-import solid_gas_full_face_copy;
+import lmr.globaldata;
+import lmr.globalconfig;
+import lmr.solid.solidfvinterface;
+import lmr.solid.ssolidblock;
+import lmr.solid.solidfvcell;
+import lmr.solid.solidbc;
+import lmr.solid.solid_full_face_copy;
+import lmr.solid.solid_gas_full_face_copy;
 
 SolidGhostCellEffect makeSolidGCEfromJson(JSONValue jsonData, int blk_id, int boundary)
 {

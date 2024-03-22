@@ -5,7 +5,7 @@
  * Date: 2022-08-08
  */
 
-module prepgrids;
+module lmr.commands.prepgrids;
 
 import std.getopt;
 import std.stdio : writeln, writefln;
@@ -18,11 +18,11 @@ import util.lua;
 import geom.luawrap;
 
 import lua_helper : initLuaStateForPrep;
-import lmrconfig : lmrCfg;
-import command;
-import globalconfig;
-import luaflowsolution;
-import luaflowstate;
+import lmr.config : lmrCfg;
+import lmr.commands.command;
+import lmr.globalconfig;
+import lmr.luawrap.luaflowsolution;
+import lmr.luawrap.luaflowstate;
 
 Command prepGridCmd;
 string cmdName = "prep-grids";

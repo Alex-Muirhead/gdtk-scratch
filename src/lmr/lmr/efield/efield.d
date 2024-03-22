@@ -5,7 +5,7 @@
  * Version: 2021-01-20: Prototyping
  */
 
-module efield;
+module lmr.efield.efield;
 
 import std.conv;
 import std.algorithm;
@@ -16,15 +16,15 @@ import ntypes.complex;
 import nm.number;
 
 import lmr.fluidfvcell;
-import fvinterface;
-import fluidblock;
+import lmr.fvinterface;
+import lmr.fluidblock;
 import geom;
-import globalconfig;
-import efieldbc;
-import efieldgmres;
-import efieldconductivity;
-import efieldexchange;
-import efieldderivatives;
+import lmr.globalconfig;
+import lmr.efield.efieldbc;
+import lmr.efield.efieldgmres;
+import lmr.efield.efieldconductivity;
+import lmr.efield.efieldexchange;
+import lmr.efield.efieldderivatives;
 version(mpi_parallel){
     import mpi;
 }

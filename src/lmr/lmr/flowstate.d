@@ -6,7 +6,7 @@
  * Version: 2014-07-17: initial cut, to explore options.
  */
 
-module flowstate;
+module lmr.flowstate;
 
 import std.string;
 import std.conv;
@@ -23,8 +23,8 @@ import util.json_helper;
 import gzip;
 import geom;
 import gas;
-import fvcellio : scan_cell_data_from_fixed_order_string;
-import globalconfig;
+import lmr.fvcellio : scan_cell_data_from_fixed_order_string;
+import lmr.globalconfig;
 
 @nogc
 void into_rotating_frame(ref Vector3 v, ref const(Vector3) pos, double omegaz)
@@ -47,8 +47,8 @@ void into_nonrotating_frame(ref Vector3 v, ref const(Vector3) pos, double omegaz
 
 struct FlowState {
 public:
-    GasState gas;  // gas state
-    Vector3 vel;   // flow velocity, m/s
+    GasState gas;      // gas state
+    Vector3 vel;       // flow velocity, m/s
     version(MHD) {
         Vector3 B;     // magnetic field strength
         number psi;    // divergence cleaning parameter
@@ -57,9 +57,9 @@ public:
     version(turbulence) {
         number[2] turb; // turbulence primitives
     }
-    number mu_t;   // turbulence viscosity
-    number k_t;    // turbulence thermal-conductivity
-    number S;         // shock indicator
+    number mu_t;       // turbulence viscosity
+    number k_t;        // turbulence thermal-conductivity
+    number S;          // shock indicator
 
     @disable this();
 

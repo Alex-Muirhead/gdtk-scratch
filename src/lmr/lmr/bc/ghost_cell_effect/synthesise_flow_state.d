@@ -15,12 +15,12 @@ import std.math;
 import std.file;
 
 import geom;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fvinterface;
-import fluidblock;
-import sfluidblock;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fvinterface;
+import lmr.fluidblock;
+import lmr.sfluidblock;
 import gas;
 import bc;
 

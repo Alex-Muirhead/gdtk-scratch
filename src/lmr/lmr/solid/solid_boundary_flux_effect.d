@@ -1,4 +1,4 @@
-module solid_boundary_flux_effect;
+module lmr.solid.solid_boundary_flux_effect;
 
 import std.math;
 import std.stdio;
@@ -7,18 +7,18 @@ import std.string;
 import std.format;
 import util.lua;
 
-import simcore;
+import lmr.simcore;
 import util.json_helper;
 import lua_helper;
 import geom;
-import globaldata;
-import globalconfig;
-import solidfvinterface;
-import ssolidblock;
-import solidfvcell;
+import lmr.globaldata;
+import lmr.globalconfig;
+import lmr.solid.solidfvinterface;
+import lmr.solid.ssolidblock;
+import lmr.solid.solidfvcell;
 import ntypes.complex;
 import nm.number;
-import solidbc;
+import lmr.solid.solidbc;
 
 SolidBoundaryFluxEffect makeSolidBFEfromJson(JSONValue jsonData, int blk_id, int boundary)
 {

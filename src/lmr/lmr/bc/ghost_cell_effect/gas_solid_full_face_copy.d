@@ -18,19 +18,19 @@ import nm.number;
 import ntypes.complex;
 import geom;
 import util.json_helper;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fvinterface;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fvinterface;
 import lmr.fluidfvcell;
-import fluidblock;
-import sfluidblock;
-import ssolidblock;
-import solidfvcell;
+import lmr.fluidblock;
+import lmr.sfluidblock;
+import lmr.solid.ssolidblock;
+import lmr.solid.solidfvcell;
 import gas;
 import bc;
 import bc.boundary_condition;
-import conservedquantities;
+import lmr.conservedquantities;
 
 
 // ----------------------------------------------------------------------------------

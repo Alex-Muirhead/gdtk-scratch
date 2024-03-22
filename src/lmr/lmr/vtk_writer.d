@@ -4,7 +4,7 @@
 // Author: Peter J. and Rowan G.
 // 2021-01-05 Extracted from postprocess.d
 
-module vtk_writer;
+module lmr.vtk_writer;
 
 import std.math;
 import std.stdio;
@@ -19,13 +19,13 @@ import std.range;
 import ntypes.complex;
 import nm.number;
 import gzip;
-import fileutil;
+import lmr.fileutil;
 import geom;
 import gas;
-import globalconfig;
-import flowsolution : FluidBlockLite;
-import solidsolution : SolidBlockLite;
-import lmrexceptions : LmrPostProcessingException;
+import lmr.globalconfig;
+import lmr.flowsolution : FluidBlockLite;
+import lmr.solid.solidsolution : SolidBlockLite;
+import lmr.exceptions : LmrPostProcessingException;
 
 
 File begin_PVD_file(string fileName)

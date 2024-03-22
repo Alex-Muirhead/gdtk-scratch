@@ -8,7 +8,7 @@
  * Date: 2015-05-06
  **/
 
-module solid_udf_source_terms;
+module lmr.solid.solid_udf_source_terms;
 
 import std.stdio;
 import std.string;
@@ -16,9 +16,9 @@ import std.conv;
 import util.lua;
 import util.lua_service;
 
-import globalconfig;
-import solidfvcell;
-import ssolidblock;
+import lmr.globalconfig;
+import lmr.solid.solidfvcell;
+import lmr.solid.ssolidblock;
 
 void initUDFSolidSourceTerms(lua_State* L, string fname)
 {

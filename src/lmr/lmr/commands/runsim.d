@@ -9,7 +9,7 @@
  *                 to decide how the execution is delegated
  */
 
-module runsim;
+module lmr.commands.runsim;
 
 import core.runtime;
 import core.stdc.stdlib : system;
@@ -25,11 +25,11 @@ import dyaml;
 
 import util.json_helper : readJSONfile;
 
-import lmrconfig;
-import globalconfig;
-import command;
-import newtonkrylovsolver : initNewtonKrylovSimulation, performNewtonKrylovUpdates;
-import timemarching: initTimeMarchingSimulation, integrateInTime, finalizeSimulation_timemarching;
+import lmr.config;
+import lmr.globalconfig;
+import lmr.commands.command;
+import lmr.newtonkrylovsolver : initNewtonKrylovSimulation, performNewtonKrylovUpdates;
+import lmr.timemarching: initTimeMarchingSimulation, integrateInTime, finalizeSimulation_timemarching;
 
 version(mpi_parallel) {
     import mpi;

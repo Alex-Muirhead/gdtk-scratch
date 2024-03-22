@@ -2,29 +2,29 @@ import std.getopt;
 import std.stdio;
 import std.algorithm;
 
-import lmrconfig;
-import command;
-import computenorms;
-import customscript;
-import probeflow;
-import sliceflow;
-import extractline;
-import limiter2vtk;
-import residual2vtk;
+import lmr.config;
+import lmr.commands.command;
+import lmr.commands.computenorms;
+import lmr.commands.customscript;
+import lmr.commands.probeflow;
+import lmr.commands.sliceflow;
+import lmr.commands.extractline;
+import lmr.commands.limiter2vtk;
+import lmr.commands.residual2vtk;
 import lmr.commands.listspecies;
 import lmr.commands.prepenergyexchange;
 import lmr.commands.prepgas;
 import lmr.commands.prepreactions;
-import prepgrids;
-import prepsim;
-import prepmappedcells;
-import runsim;
-import snapshot2vtk;
-import structured2unstructured;
-import revisionid;
+import lmr.commands.prepgrids;
+import lmr.commands.prepsim;
+import lmr.commands.prepmappedcells;
+import lmr.commands.runsim;
+import lmr.commands.snapshot2vtk;
+import lmr.commands.structured2unstructured;
+import lmr.commands.revisionid;
 
 // Eilmer4 imports
-import globalconfig : GlobalConfig;
+import lmr.globalconfig : GlobalConfig;
 
 Command[string] commands;
 Command helpCmd;

@@ -1,6 +1,6 @@
 // solid_gas_full_face_copy.d
 
-module solid_gas_full_face_copy;
+module lmr.solid.solid_gas_full_face_copy;
 
 import std.json;
 import std.string;
@@ -18,20 +18,20 @@ import nm.number;
 import ntypes.complex;
 import geom;
 import util.json_helper;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fvinterface;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fvinterface;
 import lmr.fluidfvcell;
-import fluidblock;
-import sfluidblock;
-import ssolidblock;
-import solidfvcell;
-import solidfvinterface;
+import lmr.fluidblock;
+import lmr.sfluidblock;
+import lmr.solid.ssolidblock;
+import lmr.solid.solidfvcell;
+import lmr.solid.solidfvinterface;
 import gas;
 import bc;
-import solid_ghost_cell;
-import solidbc;
+import lmr.solid.solid_ghost_cell;
+import lmr.solid.solidbc;
 
 // ----------------------------------------------------------------------------------
 // MPI-specific services.
