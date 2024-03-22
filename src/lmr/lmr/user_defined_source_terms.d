@@ -8,7 +8,7 @@
  * Date: 2015-03-17
  */
 
-module user_defined_source_terms;
+module lmr.user_defined_source_terms;
 
 import std.conv;
 import std.stdio;
@@ -18,7 +18,7 @@ import util.lua_service;
 import lua_helper;
 import gas;
 import lmr.fluidfvcell;
-import globalconfig;
+import lmr.globalconfig;
 
 void getUDFSourceTermsForCell(lua_State* L, FluidFVCell cell, size_t gtl,
                               double t, LocalConfig myConfig,

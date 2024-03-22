@@ -10,7 +10,7 @@
  *                 march-over-blocks removed; will be reinstated in own module.
  */
 
-module simcore;
+module lmr.simcore;
 
 import core.memory;
 import std.math;
@@ -31,31 +31,31 @@ import nm.number;
 import util.lua;
 import util.lua_service;
 import lua_helper;
-import fileutil;
+import lmr.fileutil;
 import geom;
 import geom.misc.kdtree;
 import gas;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fluidblock;
-import sfluidblock;
-import ufluidblock;
-import ssolidblock;
-import solidfvinterface;
-import solid_full_face_copy;
-import solid_gas_full_face_copy;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fluidblock;
+import lmr.sfluidblock;
+import lmr.ufluidblock;
+import lmr.solid.ssolidblock;
+import lmr.solid.solidfvinterface;
+import lmr.solid.solid_full_face_copy;
+import lmr.solid.solid_gas_full_face_copy;
 import bc.ghost_cell_effect.gas_solid_full_face_copy;
 import bc;
-import user_defined_source_terms;
-import solid_udf_source_terms;
-import grid_motion;
-import grid_motion_udf;
-import grid_motion_shock_fitting;
+import lmr.user_defined_source_terms;
+import lmr.solid.solid_udf_source_terms;
+import lmr.grid_motion;
+import lmr.grid_motion_udf;
+import lmr.grid_motion_shock_fitting;
 import lmr.loads;
-import conservedquantities;
-import special_block_init;
-import efield;
+import lmr.conservedquantities;
+import lmr.special_block_init;
+import lmr.efield.efield;
 version (opencl_gpu_chem) {
     import opencl_gpu_chem;
 }
@@ -67,11 +67,11 @@ version(mpi_parallel) {
 }
 version(FSI) { import fsi; }
 
-import simcore_gasdynamic_step;
-import simcore_solid_step;
-import simcore_exchange;
+import lmr.simcore_gasdynamic_step;
+import lmr.simcore_solid_step;
+import lmr.simcore_exchange;
 import util.time_utils;
-import init : readControl;
+import lmr.init : readControl;
 
 // The shared double[] flavour of GlobalConfig.userPad can give trouble,
 // so we need a normal array for the MPI task to work with.

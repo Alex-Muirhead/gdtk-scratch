@@ -17,14 +17,14 @@ import std.getopt;
 import std.conv : to;
 import std.algorithm;
 
-import globalconfig;
-import fileutil;
-import solidsolution;
-import lmrconfig : lmrCfg;
-import init : initConfiguration;
-import cmdhelper;
+import lmr.globalconfig;
+import lmr.fileutil;
+import lmr.solid.solidsolution;
+import lmr.config : lmrCfg;
+import lmr.init : initConfiguration;
+import lmr.commands.cmdhelper;
 
-import command;
+import lmr.commands.command;
 
 Command sliceSolidCmd;
 

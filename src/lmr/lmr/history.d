@@ -17,14 +17,14 @@ import std.range : empty, walkLength;
 import std.format : format;
 import std.file : append, dirEntries, SpanMode, DirEntry;
 
-import globalconfig : GlobalConfig;
-import globaldata : globalBlocks;
-import lmrconfig : lmrCfg, historyFilename;
-import fileutil : ensure_directory_is_present;
-import fluidblock : FluidBlock;
-import lmrexceptions : TimeMarchingException;
+import lmr.globalconfig : GlobalConfig;
+import lmr.globaldata : globalBlocks;
+import lmr.config : lmrCfg, historyFilename;
+import lmr.fileutil : ensure_directory_is_present;
+import lmr.fluidblock : FluidBlock;
+import lmr.exceptions : TimeMarchingException;
 import lmr.fluidfvcell : FluidFVCell;
-import fvcellio : FVCellIO, FieldVarsType, createFVCellIO, buildFluidVariables;
+import lmr.fvcellio : FVCellIO, FieldVarsType, createFVCellIO, buildFluidVariables;
 version(mpi_parallel) {
     import mpi : MPI_Barrier, MPI_COMM_WORLD;
 }

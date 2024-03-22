@@ -5,7 +5,7 @@
  * Date: 2024-04-27
  */
 
-module lmr.lmrerrors;
+module lmr.errors;
 
 import core.stdc.stdlib : exit;
 import std.stdio : writeln, writefln;

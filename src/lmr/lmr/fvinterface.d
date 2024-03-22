@@ -9,7 +9,7 @@
  *          2015-05-04: keep references to adjoining cells and defining vertices.
  */
 
-module fvinterface;
+module lmr.fvinterface;
 
 import std.stdio;
 
@@ -22,15 +22,15 @@ import nm.number;
 import nm.bbla;
 import geom;
 import gas;
-import fvvertex;
-import lmr.fluidfvcell;
-import flowstate;
-import flowgradients;
-import conservedquantities;
-import globalconfig;
-import lsqinterp;
-import mass_diffusion;
 import lmr.coredata;
+import lmr.fvvertex;
+import lmr.fluidfvcell;
+import lmr.flowstate;
+import lmr.flowgradients;
+import lmr.conservedquantities;
+import lmr.globalconfig;
+import lmr.lsqinterp;
+import lmr.mass_diffusion;
 
 enum IndexDirection {i=0, j, k, none=666}; // Needed for StructuredGrid interpolation.
 

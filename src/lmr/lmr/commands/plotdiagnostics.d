@@ -16,7 +16,7 @@ import core.stdc.stdlib : system;
 import std.process : environment;
 import std.file : copy;
 
-import command;
+import lmr.commands.command;
 
 Command plotDiagnosticsCmd;
 string cmdName = "plot-diagnostics";

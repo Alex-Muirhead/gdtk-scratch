@@ -7,7 +7,7 @@
  * Version: 2015-22-04
  */
 
-module solidfvcell;
+module lmr.solid.solidfvcell;
 
 import std.conv;
 import std.string;
@@ -18,12 +18,12 @@ import std.algorithm;
 import ntypes.complex;
 import nm.number;
 import geom;
-import solidfvinterface;
-import solidfvvertex;
+import lmr.solid.solidfvinterface;
+import lmr.solid.solidfvvertex;
 import lmr.solid.solidstate;
 import lmr.solid.solidthermalmodel;
 import std.stdio;
-import globalconfig;
+import lmr.globalconfig;
 import lmr.fvcell : FVCell;
 
 class SolidFVCell : FVCell {

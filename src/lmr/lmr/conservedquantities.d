@@ -9,14 +9,14 @@
  * 2022-08-20: Bare array.
  */
 
-module conservedquantities;
+module lmr.conservedquantities;
 
 import std.string;
 import std.format;
 import std.conv;
 import ntypes.complex;
 import nm.number;
-import globalconfig;
+import lmr.globalconfig;
 import geom;
 import gas;
 import turbulence;

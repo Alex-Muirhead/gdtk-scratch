@@ -28,23 +28,23 @@ import std.json;
 import ntypes.complex;
 import nm.number;
 
-import lmrconfig;
+import lmr.config;
 import util.json_helper;
-import globalconfig;
-import globaldata;
-import fileutil;
-import solidfvcell;
-import solidblock;
-import flowstate;
-import flowgradients;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.fileutil;
+import lmr.solid.solidfvcell;
+import lmr.solid.solidblock;
+import lmr.flowstate;
+import lmr.flowgradients;
 import geom;
-import fluidblock;
-import sfluidblock: SFluidBlock;
-import ufluidblock: UFluidBlock;
-import fvinterface;
+import lmr.fluidblock;
+import lmr.sfluidblock: SFluidBlock;
+import lmr.ufluidblock: UFluidBlock;
+import lmr.fvinterface;
 import bc;
-import mass_diffusion;
-import conservedquantities;
+import lmr.mass_diffusion;
+import lmr.conservedquantities;
 
 version(mpi_parallel) {
     import mpi;

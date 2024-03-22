@@ -10,7 +10,7 @@
  *   2024-03-21 moved from the lmr commands to its own separate executable to allow for complex number version
  */
 
-module checkjacobian;
+module lmr.commands.checkjacobian;
 
 import std.stdio;
 import std.algorithm;
@@ -26,16 +26,16 @@ import nm.number : number;
 import nm.smla;
 import ntypes.complex;
 
-import globalconfig;
-import globaldata : localFluidBlocks;
-import init : initConfiguration;
-import newtonkrylovsolver;
-import cmdhelper;
-import command;
+import lmr.globalconfig;
+import lmr.globaldata : localFluidBlocks;
+import lmr.init : initConfiguration;
+import lmr.newtonkrylovsolver;
+import lmr.commands.cmdhelper;
+import lmr.commands.command;
 import util.json_helper;
-import lmrconfig;
-import blockio;
-import flowsolution;
+import lmr.config;
+import lmr.blockio;
+import lmr.flowsolution;
 
 string cmdName;
 Command checkJacCmd;

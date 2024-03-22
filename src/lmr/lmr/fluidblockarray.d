@@ -4,7 +4,7 @@
 //
 // PJ, 2021-Feb
 
-module fluidblockarray;
+module lmr.fluidblockarray;
 
 import std.algorithm;
 import std.conv;
@@ -16,8 +16,8 @@ import std.format;
 import ntypes.complex;
 import nm.number;
 import geom;
-import globalconfig;
-import globaldata;
+import lmr.globalconfig;
+import lmr.globaldata;
 import util.json_helper;
 version(mpi_parallel) {
     import mpi;

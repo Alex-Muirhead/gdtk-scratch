@@ -6,7 +6,7 @@
  * Date: 2023-07-14
  */
 
-module cmdhelper;
+module lmr.commands.cmdhelper;
 
 import std.stdio;
 import std.file;
@@ -20,7 +20,7 @@ import std.conv : to;
 
 import dyaml;
 
-import lmrconfig : lmrCfg;
+import lmr.config : lmrCfg;
 
 string[] determineAvailableSnapshots(string dir="")
 {

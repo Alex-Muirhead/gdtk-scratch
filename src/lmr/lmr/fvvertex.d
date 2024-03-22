@@ -6,18 +6,18 @@
  * Version: 2014-07-17: initial cut, to explore options.
  */
 
-module fvvertex;
+module lmr.fvvertex;
 
 import std.string;
 import std.conv;
 import geom;
 import gas;
-import globalconfig;
-import flowstate;
-import flowgradients;
+import lmr.globalconfig;
+import lmr.flowstate;
+import lmr.flowgradients;
 import lmr.fluidfvcell : FluidFVCell;
-import fvinterface;
-import lsqinterp;
+import lmr.fvinterface;
+import lmr.lsqinterp;
 import ntypes.complex;
 import nm.number;
 

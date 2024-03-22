@@ -9,7 +9,7 @@
  *              eilmer/init_simulation.d
  **/
 
-module init;
+module lmr.init;
 
 import std.algorithm : min, sort, find;
 import std.conv : to;
@@ -26,25 +26,25 @@ import util.lua_service;
 import lua_helper;
 
 import util.json_helper;
-import lmrexceptions : LmrException;
-import lmrconfig;
-import globalconfig;
-import globaldata;
-import simcore;
-import simcore_exchange : exchange_ghost_cell_geometry_data;
+import lmr.exceptions : LmrException;
+import lmr.config;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.simcore;
+import lmr.simcore_exchange : exchange_ghost_cell_geometry_data;
 import bc;
 import bc.ghost_cell_effect.gas_solid_full_face_copy;
-import solid_gas_full_face_copy;
-import solid_full_face_copy : SolidGCE_SolidGhostCellFullFaceCopy;
-import solidfvinterface : initPropertiesAtSolidInterfaces;
-import fluidblock : FluidBlock;
-import sfluidblock : SFluidBlock;
-import ufluidblock : UFluidBlock;
-import ssolidblock : SSolidBlock;
-import blockio : BinaryBlockIO, GzipBlockIO;
+import lmr.solid.solid_gas_full_face_copy;
+import lmr.solid.solid_full_face_copy : SolidGCE_SolidGhostCellFullFaceCopy;
+import lmr.solid.solidfvinterface : initPropertiesAtSolidInterfaces;
+import lmr.fluidblock : FluidBlock;
+import lmr.sfluidblock : SFluidBlock;
+import lmr.ufluidblock : UFluidBlock;
+import lmr.solid.ssolidblock : SSolidBlock;
+import lmr.blockio : BinaryBlockIO, GzipBlockIO;
 import lmr.fvcell : FVCell;
-import fvcellio;
-import fileutil : ensure_directory_is_present;
+import lmr.fvcellio;
+import lmr.fileutil : ensure_directory_is_present;
 import lmr.loads : init_loads_metadata_file;
 
 version(mpi_parallel) {

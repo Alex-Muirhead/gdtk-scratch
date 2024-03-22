@@ -8,7 +8,7 @@
  *   2022-10-22 Reworked as part of lmr5
  */
 
-module newtonkrylovsolver;
+module lmr.newtonkrylovsolver;
 
 import core.stdc.stdlib : exit;
 import core.memory : GC;
@@ -38,24 +38,25 @@ import lua_helper;
 import util.json_helper;
 import geom;
 
-import lmrexceptions;
-import lmrconfig;
-import conservedquantities : ConservedQuantities, copy_values_from;
-import fileutil : ensure_directory_is_present;
+import lmr.exceptions;
+import lmr.warnings;
+import lmr.config;
+import lmr.conservedquantities : ConservedQuantities, copy_values_from;
+import lmr.fileutil : ensure_directory_is_present;
 
-import globalconfig;
-import globaldata;
-import init;
-import simcore: compute_mass_balance;
-import simcore_gasdynamic_step : detect_shocks;
-import simcore_exchange;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.init;
+import lmr.simcore: compute_mass_balance;
+import lmr.simcore_gasdynamic_step : detect_shocks;
+import lmr.simcore_exchange;
 import bc;
-import fluidblock : FluidBlock;
-import sfluidblock : SFluidBlock;
-import ufluidblock : UFluidBlock;
-import user_defined_source_terms : getUDFSourceTermsForCell;
-import blockio;
-import fvcellio;
+import lmr.fluidblock : FluidBlock;
+import lmr.sfluidblock : SFluidBlock;
+import lmr.ufluidblock : UFluidBlock;
+import lmr.user_defined_source_terms : getUDFSourceTermsForCell;
+import lmr.blockio;
+import lmr.fvcellio;
 import lmr.fvcell : FVCell;
 import lmr.loads : writeLoadsToFile;
 import lmr.loads : init_current_loads_indx_dir,
@@ -63,7 +64,6 @@ import lmr.loads : init_current_loads_indx_dir,
                    writeLoadsToFile,
                    count_written_loads,
                    update_loads_metadata_file;
-import lmr.lmrwarnings;
 
 version(mpi_parallel) {
     import mpi;

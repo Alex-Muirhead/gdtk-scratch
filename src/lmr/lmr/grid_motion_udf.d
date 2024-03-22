@@ -1,7 +1,7 @@
 // Lua interface functions for grid motion.
 // Authors: RG, PJ
 //
-module grid_motion_udf;
+module lmr.grid_motion_udf;
 
 import std.string;
 import std.conv;
@@ -14,16 +14,16 @@ import ntypes.complex;
 import nm.number;
 import nm.luabbla;
 import lua_helper;
-import fvvertex;
-import fvinterface;
-import globalconfig;
-import globaldata;
+import lmr.fvvertex;
+import lmr.fvinterface;
+import lmr.globalconfig;
+import lmr.globaldata;
 import geom;
 import geom.luawrap;
-import fluidblock;
-import sfluidblock;
-import ufluidblock;
-import grid_motion;
+import lmr.fluidblock;
+import lmr.sfluidblock;
+import lmr.ufluidblock;
+import lmr.grid_motion;
 
 
 void setGridMotionHelperFunctions(lua_State *L)

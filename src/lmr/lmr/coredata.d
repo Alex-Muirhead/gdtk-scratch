@@ -10,11 +10,11 @@ module lmr.coredata;
 
 import nm.number;
 import geom;
-import flowstate;
-import flowgradients;
-import conservedquantities;
-import lsqinterp;
-import onedinterp : L2R2InterpData, L3R3InterpData;
+import lmr.flowstate;
+import lmr.flowgradients;
+import lmr.conservedquantities;
+import lmr.lsqinterp;
+import lmr.onedinterp : L2R2InterpData, L3R3InterpData;
 
 struct FluidCellData{
     size_t[] all_cell_idxs;

@@ -18,12 +18,12 @@ version(mpi_parallel) {
 
 import geom;
 import util.json_helper;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fvinterface;
-import fluidblock;
-import sfluidblock;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fvinterface;
+import lmr.fluidblock;
+import lmr.sfluidblock;
 import gas;
 import bc;
 import bc.ghost_cell_effect.gas_solid_full_face_copy;

@@ -5,7 +5,7 @@
  * Date: 2024-07-18
  */
 
-module lmr.lmrwarnings;
+module lmr.warnings;
 
 import std.format;
 

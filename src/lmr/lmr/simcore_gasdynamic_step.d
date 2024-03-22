@@ -3,7 +3,7 @@
 // 2021-04-14
 //
 
-module simcore_gasdynamic_step;
+module lmr.simcore_gasdynamic_step;
 
 import std.math;
 import std.stdio;
@@ -22,29 +22,29 @@ import nm.schedule;
 import geom;
 import geom.misc.kdtree;
 import gas;
-import conservedquantities;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fluidblock;
-import sfluidblock;
-import ufluidblock;
-import ssolidblock;
-import solidfvinterface;
-import solid_full_face_copy;
-import solid_gas_full_face_copy;
+import lmr.conservedquantities;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fluidblock;
+import lmr.sfluidblock;
+import lmr.ufluidblock;
+import lmr.solid.ssolidblock;
+import lmr.solid.solidfvinterface;
+import lmr.solid.solid_full_face_copy;
+import lmr.solid.solid_gas_full_face_copy;
 import bc.ghost_cell_effect.gas_solid_full_face_copy;
 import bc;
-import user_defined_source_terms;
-import solid_udf_source_terms;
-import grid_motion;
-import grid_motion_udf;
-import grid_motion_shock_fitting;
+import lmr.user_defined_source_terms;
+import lmr.solid.solid_udf_source_terms;
+import lmr.grid_motion;
+import lmr.grid_motion_udf;
+import lmr.grid_motion_shock_fitting;
 version(mpi_parallel) {
     import mpi;
 }
 version(FSI) { import fsi; }
-import simcore_exchange;
+import lmr.simcore_exchange;
 
 
 // To avoid race conditions, there are a couple of locations where

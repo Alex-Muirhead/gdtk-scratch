@@ -17,8 +17,8 @@ import std.format : format;
 
 import util.lua;
 
-import command;
-import lmrexceptions : LmrPreProcessingException;
+import lmr.commands.command;
+import lmr.exceptions : LmrPreProcessingException;
 
 Command prepGasCmd;
 string cmdName = "prep-gas";

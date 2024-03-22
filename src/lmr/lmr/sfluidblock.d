@@ -5,7 +5,7 @@
 
 // Peter J. 2014-07-20 first cut.
 
-module sfluidblock;
+module lmr.sfluidblock;
 
 import std.conv;
 import std.file;
@@ -29,24 +29,24 @@ import gzip;
 import geom;
 import gas;
 import kinetics;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fluxcalc;
-import flowgradients;
-import fvvertex;
-import fvinterface;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fluxcalc;
+import lmr.flowgradients;
+import lmr.fvvertex;
+import lmr.fvinterface;
 import lmr.fluidfvcell;
 import lmr.coredata;
-import onedinterp;
-import fluidblock;
+import lmr.conservedquantities;
+import lmr.onedinterp;
+import lmr.fluidblock;
 import bc;
-import grid_motion;
-import conservedquantities;
-import grid_motion_udf;
+import lmr.grid_motion;
+import lmr.grid_motion_udf;
 import geom.luawrap.luasgrid;
-import luaflowstate;
-import block;
+import lmr.luawrap.luaflowstate;
+import lmr.block;
 
 // EPSILON parameter for numerical differentiation of flux jacobian
 // Value used based on Vanden and Orkwis (1996), AIAA J. 34:6 pp. 1125-1129

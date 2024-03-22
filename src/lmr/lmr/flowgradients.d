@@ -9,7 +9,7 @@
  *          2015-12-27: viscous flux calculation sent to the FVInterface class
  */
 
-module flowgradients;
+module lmr.flowgradients;
 
 import std.math;
 import std.stdio;
@@ -20,12 +20,12 @@ import nm.rsla;
 
 import geom;
 import gas;
-import flowstate;
-import conservedquantities;
-import fvinterface;
-import fvvertex;
-import globalconfig;
-import mass_diffusion;
+import lmr.flowstate;
+import lmr.conservedquantities;
+import lmr.fvinterface;
+import lmr.fvvertex;
+import lmr.globalconfig;
+import lmr.mass_diffusion;
 
 immutable size_t cloud_nmax = 12;
 

@@ -4,7 +4,7 @@
 // Now a derived class from the Block base class
 // Kyle A. Damm 2020-02-11
 
-module fluidblock;
+module lmr.fluidblock;
 
 import std.algorithm;
 import std.conv;
@@ -24,25 +24,25 @@ import gas.luagas_model;
 import geom;
 import gas;
 import kinetics;
-import globalconfig;
-import globaldata;
-import flowstate;
-import fvvertex;
-import fvinterface;
+import lmr.globalconfig;
+import lmr.globaldata;
+import lmr.flowstate;
+import lmr.fvvertex;
+import lmr.fvinterface;
 import lmr.fluidfvcell;
 import lmr.coredata;
-import flowgradients;
+import lmr.flowgradients;
 import bc;
-import user_defined_source_terms;
-import conservedquantities;
+import lmr.user_defined_source_terms;
+import lmr.conservedquantities;
 import lua_helper;
 import util.json_helper;
-import grid_motion;
+import lmr.grid_motion;
 import grid_deform;
-import sfluidblock; // needed for some special-case processing, below
-import shockdetectors;
-import block;
-import jacobian;
+import lmr.sfluidblock; // needed for some special-case processing, below
+import lmr.shockdetectors;
+import lmr.block;
+import lmr.jacobian;
 version(mpi_parallel) {
     import mpi;
 }

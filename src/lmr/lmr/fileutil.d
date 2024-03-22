@@ -3,13 +3,15 @@
 //
 // Extracted from e4_core.d 2015-02-28 so we can reuse them.
 
+module lmr.fileutil;
+
 import std.stdio;
 import std.file;
 import std.conv;
 import std.array;
 import std.format;
 import std.string;
-import globalconfig: FlowSolverException;
+import lmr.globalconfig: FlowSolverException;
 import core.thread;
 
 string make_path_name(string mytype)(int tindx)
