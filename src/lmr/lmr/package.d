@@ -1,10 +1,10 @@
 module lmr;
 
-public import flowsolution;
-public import init;
+public import lmr.flowsolution;
+public import lmr.init;
 public import lmr.fvcell;
 
-public import globalconfig;
-public import globaldata;
-public import lmrconfig;
-public import fileutil;
+public import lmr.globalconfig;
+public import lmr.globaldata;
+public import lmr.config;
+public import lmr.fileutil;
