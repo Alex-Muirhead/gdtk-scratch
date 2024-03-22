@@ -34,7 +34,7 @@
     {
       "name": "library",
       "targetType": "sourceLibrary",
-      "excludedSourceFiles": ["lmr/main.d"]
+      "excludedSourceFiles": ["lmr/main.d", "lmr/commands/checkjacobian.d"]
     }
   ],
 }
