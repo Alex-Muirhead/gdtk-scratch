@@ -23,8 +23,8 @@ import nm.number;
 import geom.misc.kdtree;
 
 import geom;
-import grid.paver: PavedGrid, POINT_LIST, FACE_LIST, CELL_LIST;
-import grid.paver2d;
+import geom.grid.paver: PavedGrid, POINT_LIST, FACE_LIST, CELL_LIST;
+import paver2d = geom.grid.paver2d;
 
 //-----------------------------------------------------------------
 // For the USGCell types, we will have only the linear elements,
@@ -498,7 +498,7 @@ public:
         }
         // At this point, we should have a closed region defined by its bounding polygon.
         // Need to fill in interior points, faces and cells.
-        grid.paver2d.fill_interior(vertices, faces, faceIndices, cells, bndry_vtx_ids);
+        paver2d.fill_interior(vertices, faces, faceIndices, cells, bndry_vtx_ids);
         // Should also be able to use any other algorithm, such as an advancing-front method.
         //
         // Fill in some other properties that the flow-code expects.

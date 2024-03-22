@@ -23,8 +23,8 @@ version (with_dvode)
 {
     import kinetics.luapseudo_species_kinetics;
 }
-import luaidealgasflow;
-import luagasflow;
+import gasdyn.luaidealgasflow;
+import gasdyn.luagasflow;
 import nm.luabbla;
 
 int main(string[] args) {

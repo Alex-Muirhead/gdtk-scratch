@@ -35,7 +35,7 @@ import bc;
 import user_defined_source_terms;
 import conservedquantities;
 import lua_helper;
-import json_helper;
+import util.json_helper;
 import grid_motion;
 import grid_deform;
 import sfluidblock; // needed for some special-case processing, below

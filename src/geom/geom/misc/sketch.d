@@ -29,7 +29,7 @@ import std.algorithm;
 import ntypes.complex;
 import nm.number;
 
-import misc.svg;
+import geom.misc.svg;
 version(with_libplot) {
     import libplot;
 }
