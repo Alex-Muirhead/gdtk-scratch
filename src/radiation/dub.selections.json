@@ -3,15 +3,8 @@
 	"versions": {
 		"ceq": {"path":"../extern/ceq"},
 		"dyaml": {"path":"../extern/D-YAML"},
-		"gas": {"path":"../gas"},
-		"gasdyn": {"path":"../gasdyn"},
-		"geom": {"path":"../geom"},
+		"gdtk": {"path":".."},
 		"gzip": {"path":"../extern/gzip"},
-		"kinetics": {"path":"../kinetics"},
-		"lmr": {"path":"../lmr"},
-		"nm": {"path":"../nm"},
-		"ntypes": {"path":"../ntypes"},
-		"tinyendian": "0.2.0",
-		"util": {"path":"../util"}
+		"tinyendian": "0.2.0"
 	}
 }

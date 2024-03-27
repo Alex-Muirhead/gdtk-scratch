@@ -9,9 +9,10 @@
   "targetName": "radiation",
   "dependencies": {
     "gdtk:lmr": { "path": ".." },
+    "gdtk:geom": { "path": ".." },
   },
   "toolchainRequirements": {
+    "ldc": "~>1.30",
     "dmd": ">=2.107",
-    "ldc": "~>1.30"
   }
 }
