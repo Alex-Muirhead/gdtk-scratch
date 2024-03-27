@@ -118,7 +118,7 @@ string[] buildFluidVariables()
     if (cfg.conductivity_model_name != "none") {
         variables ~= "sigma";
     }
-    //
+    variables ~= "Qrad";
     return variables;
 } // end buildFluidVariables()
 
@@ -252,6 +252,7 @@ public:
         case "e": return fcell.fs.gas.u.re;
         case "T": return fcell.fs.gas.T.re;
         case "sigma": return fcell.fs.gas.sigma.re;
+	    case "Qrad": return fcell.fs.Qrad.re;
         default:
             throw new LmrException("Invalid selection for cell variable: " ~ var);
         }
@@ -309,6 +310,7 @@ public:
         case "e": fcell.fs.gas.u.re = value; return fcell.fs.gas.u.re;
         case "T": fcell.fs.gas.T.re = value; return fcell.fs.gas.T.re;
         case "sigma": fcell.fs.gas.sigma.re = value; return fcell.fs.gas.sigma.re;
+        case "Qrad": fcell.fs.Qrad.re = value; return fcell.fs.Qrad.re;
         default:
             throw new LmrException("Invalid selection for cell variable: " ~ var);
         }
