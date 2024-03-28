@@ -54,22 +54,57 @@ void main() {
     auto dirName = snapshotDirectory(nWrittenSnapshots);
     ensure_directory_is_present(dirName);
 
-    auto firstBlock = localFluidBlocks[0];
-    auto firstCell  = firstBlock.cells[0];
+    size_t cell_id = 0;
 
-    Vector3 startPoint = firstCell.pos[0];
+    auto firstBlock = localFluidBlocks[0];
+    auto cell = firstBlock.cells[cell_id];
+    auto decay = 0.01; // NOTE: Should be proportional to the step size
+
+    Vector3 rayPoint = cell.pos[0];
+    auto rayStrength = cell.fs.Qrad;
 
     // Structure doesn't move, so we can take first position
-    writeln("Cell 0 at pos: ", startPoint);
+    writeln("Cell 0 at pos: ", rayPoint);
 
     auto direction = Vector3([1, 1, 0]);
     direction.normalize();
     auto stepLength = 0.001;
 
-    for (auto i = 0; i < 100; i++) {
-        startPoint += direction * stepLength;
-        bool contained = blockGrids[0].point_is_inside_cell(startPoint, 0);
-        writeln("Moved to point: ", startPoint, " contained? ", contained);
+    for (auto i = 0; i < 1000; i++) {
+        rayPoint += direction * stepLength;
+        auto heating = decay * rayStrength;
+        rayStrength -= heating;
+
+        bool contained = blockGrids[0].point_is_inside_cell(rayPoint, cell_id);
+        if (!contained) {
+            size_t neighbour_id;
+            inner: foreach (neighbour; cell.cell_cloud) {
+                neighbour_id = neighbour.id;
+                if (neighbour_id > 1_000_000_000) {
+                    // HACK: Dealing with weird ghost-cell ids
+                    continue inner;
+                }
+                if (blockGrids[0].point_is_inside_cell(rayPoint, neighbour_id)) {
+                    contained = true;
+                    break inner;
+                }
+            }
+            if (contained) {
+                // Successfully found next point
+                cell_id = neighbour_id;
+                cell = firstBlock.cells[cell_id];
+            } else {
+                writeln("Error! Couldn't find the thing");
+                break;
+            }
+        }
+        writeln("Moved to point: ", rayPoint, " within cell ", cell_id);
+
+        // This has to be at the end, since we have to find *where* to dump the 
+        // energy before ending the routine. 
+        if (rayStrength < 1E-3) { // Some minimum energy threshold
+            break;
+        }
     }
 
     // The method `geom.grid.usgrid.UnstructuredGrid.get_list_of_boundary_cells`
