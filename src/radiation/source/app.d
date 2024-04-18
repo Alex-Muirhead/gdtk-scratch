@@ -1,4 +1,6 @@
+import std.math : cos, sin, PI;
 import std.stdio;
+import std.random : Random, uniform;
 
 import lmr.config;
 import lmr.fileutil : ensure_directory_is_present;
@@ -35,7 +37,8 @@ void main() {
     Grid[] blockGrids = [];
     foreach (blk; localFluidBlocks) {
         foreach (cell; blk.cells) {
-            cell.fs.Qrad = StefanBoltzmann_constant * cell.fs.gas.T ^^ 4;
+            // Set everything to zero to be sure
+            cell.fs.Qrad = 0.0;
         }
 
         final switch (blk.grid_type) {
@@ -54,59 +57,74 @@ void main() {
     auto dirName = snapshotDirectory(nWrittenSnapshots);
     ensure_directory_is_present(dirName);
 
-    size_t cell_id = 0;
+    auto rng = Random(4);  // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
 
-    auto firstBlock = localFluidBlocks[0];
-    auto cell = firstBlock.cells[cell_id];
     auto decay = 0.01; // NOTE: Should be proportional to the step size
-
-    Vector3 rayPoint = cell.pos[0];
-    auto rayStrength = cell.fs.Qrad;
-
-    // Structure doesn't move, so we can take first position
-    writeln("Cell 0 at pos: ", rayPoint);
-
-    auto direction = Vector3([1, 1, 0]);
-    direction.normalize();
     auto stepLength = 0.001;
 
-    for (auto i = 0; i < 1000; i++) {
-        rayPoint += direction * stepLength;
-        auto heating = decay * rayStrength;
-        rayStrength -= heating;
+    auto firstBlock = localFluidBlocks[0];
 
-        bool contained = blockGrids[0].point_is_inside_cell(rayPoint, cell_id);
-        if (!contained) {
-            size_t neighbour_id;
-            inner: foreach (neighbour; cell.cell_cloud) {
-                neighbour_id = neighbour.id;
-                if (neighbour_id > 1_000_000_000) {
-                    // HACK: Dealing with weird ghost-cell ids
-                    continue inner;
+    foreach (cell_id, ref origin; firstBlock.cells) {
+
+        // auto angle = uniform(0.0f, 2*PI, rng);
+
+        for (auto a = 0.0; a < 1; a += 0.01) {
+            // Loop through angles for now
+            auto angle = 2*PI * a;
+            auto direction = Vector3([cos(angle), sin(angle), 0]);
+            direction.normalize(); // Shouldn't be needed with random angle
+
+            writeln("Moving at angle: ", angle);
+
+            auto cell = origin;
+            Vector3 rayPoint = cell.pos[0]; // Grid isn't moving, take the first position
+
+            auto rayStrength = StefanBoltzmann_constant * cell.fs.gas.T ^^ 4;
+            cell.fs.Qrad -= rayStrength;  // Remove the energy of the ray emitted
+
+            steps: foreach (i; 0 .. 1000) {
+                rayPoint += direction * stepLength;
+                auto heating = decay * rayStrength;
+                rayStrength -= heating;
+
+                bool contained = blockGrids[0].point_is_inside_cell(rayPoint, cell_id);
+                if (!contained) {
+                    size_t neighbour_id;
+                    inner: foreach (neighbour; cell.cell_cloud) {
+                        neighbour_id = neighbour.id;
+                        Vector3[][] vertices = [];
+                        foreach (j, ref vertex; neighbour.vtx) {
+                            vertices ~= vertex.pos;
+                        }
+                        if (neighbour.is_ghost) {
+                            // FIXME: Deal with ghost cells at the boundaries
+                            continue inner;
+                        }
+                        if (blockGrids[0].point_is_inside_cell(rayPoint, neighbour_id)) {
+                            contained = true;
+                            break inner;
+                        }
+                    }
+                    if (contained) {
+                        // Successfully found next point
+                        cell_id = neighbour_id;
+                        cell = firstBlock.cells[cell_id];
+                    } else {
+                        // Could not find next cell
+                        // writeln("Error! Couldn't find the thing");
+                        break steps;
+                    }
                 }
-                if (blockGrids[0].point_is_inside_cell(rayPoint, neighbour_id)) {
-                    contained = true;
-                    break inner;
+                cell.fs.Qrad += heating * 10;
+
+                // This has to be at the end, since we have to find *where* to dump the 
+                // energy before ending the routine. 
+                if (rayStrength < 1E-3) { // Some minimum energy threshold
+                    break steps;
                 }
             }
-            if (contained) {
-                // Successfully found next point
-                cell_id = neighbour_id;
-                cell = firstBlock.cells[cell_id];
-            } else {
-                writeln("Error! Couldn't find the thing");
-                break;
-            }
-        }
-        writeln("Moved to point: ", rayPoint, " within cell ", cell_id);
-
-        // This has to be at the end, since we have to find *where* to dump the 
-        // energy before ending the routine. 
-        if (rayStrength < 1E-3) { // Some minimum energy threshold
-            break;
         }
     }
-
     // The method `geom.grid.usgrid.UnstructuredGrid.get_list_of_boundary_cells`
     // looks at what is inside a cell vs outside
     // There is also the method `geom.grid.grid.Grid.point_is_inside_cell`
