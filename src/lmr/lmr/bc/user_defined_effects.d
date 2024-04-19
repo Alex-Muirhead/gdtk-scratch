@@ -13,7 +13,7 @@
 // using the file name that it possesses.  Thus, you need to have
 // all of your user-defined effects within the one file.
 
-module bc.user_defined_effects;
+module lmr.bc.user_defined_effects;
 
 import std.conv;
 import std.string;
@@ -36,7 +36,7 @@ import lmr.sfluidblock : cell_index_to_logical_coordinates;
 import lmr.globalconfig;
 import lmr.globaldata;
 import lmr.luawrap.luaflowstate;
-import bc;
+import lmr.bc;
 
 class UserDefinedGhostCell : GhostCellEffect {
 public:

@@ -8,7 +8,7 @@
  * 2021-07-29 PJ rework ConstFlux
  **/
 
-module bc.boundary_flux_effect;
+module lmr.bc.boundary_flux_effect;
 
 import std.stdio;
 import std.json;
@@ -34,7 +34,7 @@ import lmr.solid.solidfvcell;
 import lmr.solid.solidfvinterface;
 import lmr.flowstate;
 import gas;
-import bc;
+import lmr.bc;
 import lmr.flowgradients;
 import lmr.mass_diffusion;
 //import nm.ridder;

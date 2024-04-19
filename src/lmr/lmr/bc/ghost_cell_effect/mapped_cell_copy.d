@@ -1,6 +1,6 @@
 // mapped_cell_copy.d
 
-module bc.ghost_cell_effect.mapped_cell_copy;
+module lmr.bc.ghost_cell_effect.mapped_cell_copy;
 
 import core.memory;
 import std.json;
@@ -26,7 +26,7 @@ import lmr.fluidfvcell;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
+import lmr.bc;
 
 
 struct BlockAndCellId {

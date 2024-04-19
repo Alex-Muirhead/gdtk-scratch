@@ -6,7 +6,7 @@
  * Date: 2017-07-20
  */
 
-module bc.boundary_cell_effect;
+module lmr.bc.boundary_cell_effect;
 
 import std.json;
 import std.string;
@@ -19,7 +19,7 @@ import lmr.fluidblock;
 import lmr.sfluidblock: SFluidBlock;
 import lmr.globaldata;
 import util.json_helper;
-import bc;
+import lmr.bc;
 
 BoundaryCellEffect make_BCE_from_json(JSONValue jsonData, int blk_id, int boundary)
 {

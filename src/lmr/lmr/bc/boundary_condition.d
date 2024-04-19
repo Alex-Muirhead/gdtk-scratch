@@ -5,7 +5,7 @@
 // RG & PJ  2015-12-03 : Decompose boundary conditions into lists of actions
 //
 
-module bc.boundary_condition;
+module lmr.bc.boundary_condition;
 
 import std.conv;
 import std.json;
@@ -31,11 +31,11 @@ import lmr.fluxcalc;
 import lmr.solid.ssolidblock;
 import lmr.solid.solidfvcell;
 import lmr.solid.solidfvinterface;
-import bc.ghost_cell_effect;
-import bc.boundary_interface_effect;
-import bc.boundary_cell_effect;
-import bc.boundary_flux_effect;
-import bc.user_defined_effects;
+import lmr.bc.ghost_cell_effect;
+import lmr.bc.boundary_interface_effect;
+import lmr.bc.boundary_cell_effect;
+import lmr.bc.boundary_flux_effect;
+import lmr.bc.user_defined_effects;
 import lua_helper;
 import lmr.grid_motion;
 import lmr.grid_motion_udf;

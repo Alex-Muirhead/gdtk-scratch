@@ -17,7 +17,7 @@ import std.conv : to;
 import std.file : rename, exists, rmdirRecurse, mkdirRecurse;
 
 import geom;
-import bc;
+import lmr.bc;
 
 import lmr.config;
 import lmr.commands.command;

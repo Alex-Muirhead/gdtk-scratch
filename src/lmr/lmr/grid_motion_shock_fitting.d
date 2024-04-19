@@ -24,15 +24,15 @@ import lmr.fvvertex;
 import lmr.fvinterface;
 import lmr.fluidfvcell;
 import lmr.onedinterp;
-import bc;
+import lmr.bc;
 import lmr.fluidblock;
 import lmr.fluidblockarray;
 import lmr.sfluidblock;
 import geom;
 import lmr.grid_motion;
-import bc;
+import lmr.bc;
 version(mpi_parallel) {
-    import bc.ghost_cell_effect.full_face_copy : MPI_Wait_a_while, make_mpi_tag;
+    import lmr.bc.ghost_cell_effect.full_face_copy : MPI_Wait_a_while, make_mpi_tag;
 }
 
 

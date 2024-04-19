@@ -1,6 +1,6 @@
 // flow_state_copy.d
 
-module bc.ghost_cell_effect.flow_state_copy;
+module lmr.bc.ghost_cell_effect.flow_state_copy;
 
 import std.json;
 import std.string;
@@ -18,7 +18,7 @@ import lmr.fluidfvcell;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
+import lmr.bc;
 
 
 class GhostCellFlowStateCopy : GhostCellEffect {

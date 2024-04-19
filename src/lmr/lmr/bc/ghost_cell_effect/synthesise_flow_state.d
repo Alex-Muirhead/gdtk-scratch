@@ -5,7 +5,7 @@
 // and the systhesis function is over in the SyntheticFlowState class in the flowstate.d module.
 
 
-module bc.ghost_cell_effect.synthesise_flow_state;
+module lmr.bc.ghost_cell_effect.synthesise_flow_state;
 
 import std.json;
 import std.string;
@@ -22,7 +22,7 @@ import lmr.fvinterface;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
+import lmr.bc;
 
 
 class GhostCellSynthesiseFlowState : GhostCellEffect {
