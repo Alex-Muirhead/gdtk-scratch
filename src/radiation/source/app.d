@@ -3,10 +3,13 @@ import std.stdio;
 import std.random : Random, uniform;
 
 import lmr.config;
+import lmr.bc.boundary_condition : BoundaryCondition;
+import lmr.bc.ghost_cell_effect.full_face_copy : GhostCellFullFaceCopy;
 import lmr.fileutil : ensure_directory_is_present;
 import lmr.fluidblock : FluidBlock;
 import lmr.fluidfvcell : FluidFVCell;
 import lmr.fvcell : FVCell;
+import lmr.fvinterface : FVInterface;
 import lmr.globalconfig;
 import lmr.globaldata;
 import lmr.init;
@@ -19,9 +22,29 @@ import nm.number;
 
 import gas.physical_constants : StefanBoltzmann_constant;
 
-/// March across a block from the given cell in desired direction. 
-/// This **full** implementation takes many small steps across the domain
-/// FIXME: The step size should probably be dependent on cell size...
+struct Ray {
+    Vector3 position;
+    Vector3 direction;
+}
+
+
+// FIXME: The step size should probably be dependent on cell size...
+// NOTE: What do we want to return here?
+//       I'm thinking that we could return the FVInterface or BoundaryCondition
+//       that the ray hits, and then make a decision after that. 
+//       This allows us to deal with different conditions (i.e. periodic boundaries, etc)
+//       and also work out what the next block is to restart the routine.
+
+/** March across a block from the given cell in desired direction. 
+ * This **full** implementation takes many small steps across the domain
+ *
+ * Params:
+ *   cellID = The ID of the starting cell (must be within the block)
+ *   block = The block to march the ray across
+ *   direction = The direction of the ray as a Vector3
+ *   crossed = Which cells within the block the ray crosses
+ *   lengths = What distance across each respective cell the ray marched
+ */
 void marching_full(
     size_t cellID, FluidBlock block, Vector3 direction, 
     ref size_t[] crossed, ref number[] lengths) 
@@ -51,9 +74,32 @@ void marching_full(
         lengths ~= stepSize * consecutiveSteps;
         consecutiveSteps = 1;
 
-        foreach (neighbour; currentCell.cell_cloud) {
+        // NOTE: Could shortcut by checking the boundaries directly from the cell
+        //       vertices, rather than bringing all neighbours into memory
+        foreach (i, neighbour; currentCell.cell_cloud) {
             if (neighbour.is_ghost) {
                 // FIXME: Deal with ghost cells!
+                FVInterface inter = currentCell.iface[i-1]; // 0th cell is self
+                if (!inter.is_on_boundary) {
+                    throw new Exception("Ray hit a ghost cell not attached to a boundary");
+                }
+
+                BoundaryCondition boundary = block.bc[inter.bc_id];
+                auto mygce = cast (GhostCellFullFaceCopy) boundary.preReconAction[0];
+                if (mygce) {
+                    // We have a full face copy, does this only exist for structured?
+                    // I think we use `GhostCellMappedCopy` for unstructured...
+                    // QUESTION: Are there other effects that mean we walk across the boundary?
+
+                    // NOTE: We should always intersect the 0th (first) layer of the ghost cells
+                    //       in the boundary. Since ghost cells are added walking away from the
+                    //       boundary, this means we can multiply the `i_bndry` by the number
+                    //       of ghost cell layers to get the correct position of the ghost cells
+                    //       and consequently the mapped cell. 
+                    size_t boundaryCellID = inter.i_bndry * block.n_ghost_cell_layers;
+                    FluidFVCell mappedCell = mygce.mapped_cells[boundaryCellID];
+                    writeln("Cell ", currentCell.id, " maps to ", mappedCell.id);
+                }
                 continue;
             }
             isContained = currentGrid.point_is_inside_cell(rayCoord, neighbour.id);
@@ -68,7 +114,6 @@ void marching_full(
             break marchLoop;
         }
     }
-
 }
 
 Grid get_grid(FluidBlock block) {
@@ -99,19 +144,39 @@ void main() {
     initFluidBlocksZones();
     initFluidBlocksFlowField(snapshotStart);
 
+    version(mpi_parallel) { MPI_Barrier(MPI_COMM_WORLD); }
+
+    initFullFaceDataExchange();
+    initMappedCellDataExchange();
+    initGhostCellGeometry();
+
+    // Set everything to zero initially
+    // FIXME: This is because of some weird buffer thing in loading 
+    //        data during `lmr snapshot2vtk`, it takes the same
+    //        values from the previous variable (temperature here)
+    foreach (blk; localFluidBlocks) {
+        foreach (cell; blk.cells) {
+            cell.fs.Qrad = 0.0;
+        }
+    }
+
     auto dirName = snapshotDirectory(nWrittenSnapshots);
     ensure_directory_is_present(dirName);
 
     auto rng = Random(4);  // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
 
     auto decay = 0.1;
-    auto firstBlock = localFluidBlocks[0];
+    auto firstBlock = localFluidBlocks[1];
     uint angleSamples = 100;
+
+    number baseEmission = StefanBoltzmann_constant * 280 ^^ 4;
 
     foreach (cell_id, ref origin; firstBlock.cells) {
 
         // auto angle = uniform(0.0f, 2*PI, rng);
         number fullEmission = StefanBoltzmann_constant * origin.fs.gas.T ^^ 4;
+        origin.fs.Qrad -= fullEmission;  // Remove the energy of the ray emitted
+        origin.fs.Qrad += baseEmission;  // Add back baseline background radiation
 
         foreach (a; 0 .. angleSamples) {
             // Loop through angles for now
@@ -120,16 +185,14 @@ void main() {
             direction.normalize(); // Shouldn't be needed with random angle
 
             auto rayStrength = fullEmission / angleSamples;
-            origin.fs.Qrad -= rayStrength;  // Remove the energy of the ray emitted
 
             size_t[] rayCells;
             number[] rayLengths;
             marching_full(cell_id, firstBlock, direction, rayCells, rayLengths);
-            writeln("Stepped over ", rayCells.length, " cells");
 
             number heating;
             foreach (i; 0 .. rayCells.length) {
-                heating = rayStrength * (1 - (1 - decay) ^^ rayLengths[i]);
+                heating = rayStrength * (1 - (1-decay) ^^ rayLengths[i]);
                 rayStrength -= heating;
                 firstBlock.cells[rayCells[i]].fs.Qrad += heating;
             }
