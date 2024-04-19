@@ -35,7 +35,7 @@ import lmr.fluidfvcell : FluidFVCell;
 import lmr.coredata;
 import lmr.lsqinterp;
 import lmr.fluidblock;
-import bc;
+import lmr.bc;
 import lmr.grid_motion;
 import lmr.grid_motion_udf;
 import geom.luawrap.luausgrid;

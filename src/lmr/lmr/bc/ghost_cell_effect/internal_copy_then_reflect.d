@@ -1,6 +1,6 @@
 // internal_copy_then_reflect.d
 
-module bc.ghost_cell_effect.internal_copy_then_reflect;
+module lmr.bc.ghost_cell_effect.internal_copy_then_reflect;
 
 import std.json;
 import std.string;
@@ -17,7 +17,7 @@ import lmr.fluidfvcell;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
+import lmr.bc;
 
 
 class GhostCellInternalCopyThenReflect : GhostCellEffect {

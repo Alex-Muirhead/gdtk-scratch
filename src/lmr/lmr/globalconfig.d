@@ -54,7 +54,7 @@ import lmr.fluidblockarray;
 import lmr.sfluidblock: SFluidBlock;
 import lmr.ufluidblock: UFluidBlock;
 import lmr.solid.ssolidblock;
-import bc;
+import lmr.bc;
 import lmr.user_defined_source_terms;
 import lmr.solid.solid_udf_source_terms;
 import lmr.grid_motion;

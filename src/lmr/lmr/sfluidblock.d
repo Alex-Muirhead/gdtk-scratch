@@ -41,7 +41,7 @@ import lmr.coredata;
 import lmr.conservedquantities;
 import lmr.onedinterp;
 import lmr.fluidblock;
-import bc;
+import lmr.bc;
 import lmr.grid_motion;
 import lmr.grid_motion_udf;
 import geom.luawrap.luasgrid;

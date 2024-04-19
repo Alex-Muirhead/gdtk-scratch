@@ -50,7 +50,7 @@ import lmr.init;
 import lmr.simcore: compute_mass_balance;
 import lmr.simcore_gasdynamic_step : detect_shocks;
 import lmr.simcore_exchange;
-import bc;
+import lmr.bc;
 import lmr.fluidblock : FluidBlock;
 import lmr.sfluidblock : SFluidBlock;
 import lmr.ufluidblock : UFluidBlock;

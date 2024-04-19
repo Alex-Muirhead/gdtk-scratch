@@ -6,7 +6,7 @@
 //    the break-up of the Fixed_T boundary condition.
 //
 
-module bc.boundary_interface_effect;
+module lmr.bc.boundary_interface_effect;
 
 import std.json;
 import std.string;
@@ -28,7 +28,7 @@ import lmr.fluidfvcell;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
+import lmr.bc;
 import lmr.solid.solidfvcell;
 import lmr.solid.solidfvinterface;
 import kinetics.equilibrium_update;
