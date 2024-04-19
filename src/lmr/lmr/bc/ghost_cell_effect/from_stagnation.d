@@ -1,6 +1,6 @@
 // from_stagnation.d
 
-module bc.ghost_cell_effect.from_stagnation;
+module lmr.bc.ghost_cell_effect.from_stagnation;
 
 import std.json;
 import std.string;
@@ -21,7 +21,7 @@ import lmr.fluidfvcell;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
+import lmr.bc;
 
 
 class GhostCellFromStagnation : GhostCellEffect {

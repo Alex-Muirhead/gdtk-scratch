@@ -1,6 +1,6 @@
 // fixed_p.d
 
-module bc.ghost_cell_effect.fixed_p;
+module lmr.bc.ghost_cell_effect.fixed_p;
 
 import std.json;
 import std.string;
@@ -17,7 +17,7 @@ import lmr.fluidfvcell;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
+import lmr.bc;
 
 
 class GhostCellFixedP : GhostCellEffect {

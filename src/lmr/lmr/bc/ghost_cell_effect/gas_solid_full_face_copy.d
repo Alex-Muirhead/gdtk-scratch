@@ -1,6 +1,6 @@
 // gas_solid_full_face_copy.d
 
-module bc.ghost_cell_effect.gas_solid_full_face_copy;
+module lmr.bc.ghost_cell_effect.gas_solid_full_face_copy;
 
 import std.json;
 import std.string;
@@ -28,8 +28,8 @@ import lmr.sfluidblock;
 import lmr.solid.ssolidblock;
 import lmr.solid.solidfvcell;
 import gas;
-import bc;
-import bc.boundary_condition;
+import lmr.bc;
+import lmr.bc.boundary_condition;
 import lmr.conservedquantities;
 
 

@@ -1,6 +1,6 @@
 // flow_state_copy_from_profile.d
 
-module bc.ghost_cell_effect.flow_state_copy_from_profile;
+module lmr.bc.ghost_cell_effect.flow_state_copy_from_profile;
 
 import std.json;
 import std.string;
@@ -17,7 +17,7 @@ import lmr.fvinterface;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
+import lmr.bc;
 
 
 class GhostCellFlowStateCopyFromProfile : GhostCellEffect {

@@ -32,7 +32,7 @@ import lmr.fvinterface;
 import lmr.fluidfvcell;
 import lmr.coredata;
 import lmr.flowgradients;
-import bc;
+import lmr.bc;
 import lmr.user_defined_source_terms;
 import lmr.conservedquantities;
 import lua_helper;

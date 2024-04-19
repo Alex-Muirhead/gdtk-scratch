@@ -3,7 +3,7 @@
 // RG & PJ 2015-12-03 : first hack
 //         2018-01-20 : refactor into a package
 
-module bc.ghost_cell_effect.ghost_cell;
+module lmr.bc.ghost_cell_effect.ghost_cell;
 
 import std.json;
 import std.string;
@@ -25,8 +25,8 @@ import lmr.fvinterface;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
-import bc.ghost_cell_effect.gas_solid_full_face_copy;
+import lmr.bc;
+import lmr.bc.ghost_cell_effect.gas_solid_full_face_copy;
 
 @nogc
 void reflect_normal_velocity(ref FlowState fs, in FVInterface IFace)

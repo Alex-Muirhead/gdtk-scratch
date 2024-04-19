@@ -19,8 +19,8 @@ import geom;
 import util.json_helper;
 import nm.number;
 import lmr.efield.efieldconductivity;
-import bc.boundary_condition;
-import bc.ghost_cell_effect.full_face_copy;
+import lmr.bc.boundary_condition;
+import lmr.bc.ghost_cell_effect.full_face_copy;
 
 interface FieldBC {
     bool isShared() const;

@@ -42,7 +42,7 @@ import lmr.fluidblock;
 import lmr.sfluidblock: SFluidBlock;
 import lmr.ufluidblock: UFluidBlock;
 import lmr.fvinterface;
-import bc;
+import lmr.bc;
 import lmr.mass_diffusion;
 import lmr.conservedquantities;
 

@@ -5,7 +5,7 @@
 //
 // Added the DualState class for Flynn Hack, PJ 2022-06-26.
 
-module bc.ghost_cell_effect.from_upwind;
+module lmr.bc.ghost_cell_effect.from_upwind;
 
 import std.json;
 import std.string;
@@ -24,7 +24,7 @@ import lmr.fluidfvcell;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
+import lmr.bc;
 
 
 class GhostCellFromUpwindCopy : GhostCellEffect {

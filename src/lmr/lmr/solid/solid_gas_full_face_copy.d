@@ -31,7 +31,7 @@ import lmr.solid.ssolidblock;
 import lmr.solid.solidfvcell;
 import lmr.solid.solidfvinterface;
 import gas;
-import bc;
+import lmr.bc;
 import lmr.solid.solid_ghost_cell;
 import lmr.solid.solidbc;
 

@@ -1,6 +1,6 @@
 // extrapolate_copy.d
 
-module bc.ghost_cell_effect.extrapolate_copy;
+module lmr.bc.ghost_cell_effect.extrapolate_copy;
 
 import std.json;
 import std.string;
@@ -17,7 +17,7 @@ import lmr.fluidfvcell;
 import lmr.fluidblock;
 import lmr.sfluidblock;
 import gas;
-import bc;
+import lmr.bc;
 
 
 class GhostCellExtrapolateCopy : GhostCellEffect {

@@ -21,7 +21,7 @@ import lmr.globaldata;
 import lmr.fluidblock;
 import lmr.init;
 import geom;
-import bc;
+import lmr.bc;
 
 Command prepMappedCellsCmd;
 string cmdName = "prep-mapped-cells";
