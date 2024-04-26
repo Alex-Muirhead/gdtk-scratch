@@ -6,7 +6,8 @@
   "description": "Radiation Transport Sovler",
   "license": "GPL-3.0",
   "name": "radiation",
-  "targetName": "radiation",
+  "targetName": "lmr-radiation",
+  "targetPath": "../../build/bin/",
   "dependencies": {
     "gdtk:lmr": { "path": ".." },
     "gdtk:geom": { "path": ".." },
