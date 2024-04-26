@@ -81,7 +81,8 @@ void marching_full(
                 // FIXME: Deal with ghost cells!
                 FVInterface inter = currentCell.iface[i-1]; // 0th cell is self
                 if (!inter.is_on_boundary) {
-                    throw new Exception("Ray hit a ghost cell not attached to a boundary");
+                    // throw new Exception("Ray hit a ghost cell not attached to a boundary");
+                    continue;
                 }
 
                 BoundaryCondition boundary = block.bc[inter.bc_id];
@@ -131,7 +132,7 @@ void main() {
     writeln("Initial workings on a standalone radiation post-processing code.");
 
     // Hard-code how many snapshots we're working with
-    uint snapshotStart = 0003;
+    uint snapshotStart = 0004;
     uint nWrittenSnapshots = snapshotStart + 1;
 
     alias cfg = GlobalConfig;
@@ -165,8 +166,8 @@ void main() {
 
     auto rng = Random(4);  // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
 
-    auto decay = 0.1;
-    auto firstBlock = localFluidBlocks[1];
+    auto decay = 0.5;
+    auto firstBlock = localFluidBlocks[0];
     uint angleSamples = 100;
 
     number baseEmission = StefanBoltzmann_constant * 280 ^^ 4;
@@ -174,9 +175,9 @@ void main() {
     foreach (cell_id, ref origin; firstBlock.cells) {
 
         // auto angle = uniform(0.0f, 2*PI, rng);
-        number fullEmission = StefanBoltzmann_constant * origin.fs.gas.T ^^ 4;
+        number fullEmission = origin.volume[0] * StefanBoltzmann_constant * origin.fs.gas.T ^^ 4;
+        fullEmission -= baseEmission; // Add back baseline background radiation
         origin.fs.Qrad -= fullEmission;  // Remove the energy of the ray emitted
-        origin.fs.Qrad += baseEmission;  // Add back baseline background radiation
 
         foreach (a; 0 .. angleSamples) {
             // Loop through angles for now
