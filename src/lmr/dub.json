@@ -4,6 +4,7 @@
   ],
   "copyright": "Copyright © 2023, GDTK Dev Group",
   "description": "Eilmer 5 Application",
+  "homepage": "gdtk.uqcloud.net",
   "license": "GPL-3.0",
   "name": "lmr",
   "sourcePaths": ["."],
@@ -29,12 +30,36 @@
     {
       "name": "executable",
       "targetType": "executable",
+      "targetPath": "../../build/bin",
       "mainSourceFile": "lmr/main.d",
+      "sourceFiles": ["lmr/commands/runsim.d"],
+      "excludedSourceFiles": ["lmr/commands/checkjacobian.d"],
+    },
+    {
+      "name": "shared-runner",
+      "targetType": "executable",
+      "targetPath": "../../build/bin",
+      "targetName": "lmr-run",
+      "mainSourceFile": "lmr/commands/runsim.d",
+      "versions": ["run_main"],
+      "excludedSourceFiles": ["lmr/commands/checkjacobian.d"],
+    },
+    {
+      "name": "mpi-runner",
+      "targetType": "executable",
+      "targetPath": "../../build/bin",
+      "targetName": "lmr-mpi-run",
+      "mainSourceFile": "lmr/commands/runsim.d",
+      "versions": ["run_main", "mpi_parallel"],
+      "excludedSourceFiles": ["lmr/commands/checkjacobian.d"],
+      "dependencies": {
+        "mpi": { "path": "../extern/OpenMPI" }
+      },
     },
     {
       "name": "library",
       "targetType": "sourceLibrary",
-      "excludedSourceFiles": ["lmr/main.d", "lmr/commands/checkjacobian.d"]
+      "excludedSourceFiles": ["lmr/main.d", "lmr/commands/checkjacobian.d"],
     }
   ],
 }

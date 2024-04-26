@@ -8,60 +8,62 @@
 module lmr.config;
 
 import std.stdio;
+import std.compiler;
 import std.conv : to;
 import std.format : format;
 import std.process : environment;
 import std.json;
-import util.json_helper : readJSONfile;
+import util.json_helper : readJSONfile, getJSONstring;
 
 import lmr.globalconfig;
 
 struct LmrCfg {
-    shared immutable string simDir;
-    shared immutable string jobFile;
-    shared immutable string cfgFile;
-    shared immutable string ctrlFile;
-    shared immutable string progFile;
-    shared immutable string nkCfgFile;
-    shared immutable string blkIdxFmt;
-    shared immutable string cellIdxFmt;
-    shared immutable string snapshotDir;
-    shared immutable string snapshotIdxFmt;
-    shared immutable string historyDir;
-    shared immutable string historyPrefix;
-    shared immutable int initialFieldDir;
-    shared immutable string fluidMetadataFile;
-    shared immutable string solidMetadataFile;
-    shared immutable string limiterMetadataFile;
-    shared immutable string residualMetadataFile;
-    shared immutable string gradientMetadataFile;
-    shared immutable string restartFile;
-    shared immutable string timesFile;
-    shared immutable string referenceResidualsFile;
-    shared immutable string fluidPrefix;
-    shared immutable string solidPrefix;
-    shared immutable string limiterPrefix;
-    shared immutable string residualPrefix;
-    shared immutable string gradientPrefix;
-    shared immutable string loadsDir;
-    shared immutable string loadsPrefix;
-    shared immutable string gridPrefix;
-    shared immutable string gridDir;
-    shared immutable string gridDirectory;
-    shared immutable string gridMetadataFile;
-    shared immutable string savedSgridDir;
-    shared immutable string gzipExt;
-    shared immutable string blkListFile;
-    shared immutable string vtkDir;
-    shared immutable string mpimapFile;
-    shared immutable string mappedCellsFile;
-    shared immutable string transResidFile;
-    shared immutable string dblVarFmt;
-    shared immutable string revisionId = "PUT_REVISION_STRING_HERE";
-    shared immutable string fullRevisionId = "PUT_FULL_REVISION_STRING_HERE";
-    shared immutable string revisionDate = "PUT_REVISION_DATE_HERE";
-    shared immutable string compilerName = "PUT_COMPILER_NAME_HERE";
-    shared immutable string buildDate = "PUT_BUILD_DATE_HERE";
+    immutable string simDir;
+    immutable string jobFile;
+    immutable string cfgFile;
+    immutable string ctrlFile;
+    immutable string progFile;
+    immutable string nkCfgFile;
+    immutable string blkIdxFmt;
+    immutable string cellIdxFmt;
+    immutable string snapshotDir;
+    immutable string snapshotIdxFmt;
+    immutable string historyDir;
+    immutable string historyPrefix;
+    immutable int initialFieldDir;
+    immutable string fluidMetadataFile;
+    immutable string solidMetadataFile;
+    immutable string limiterMetadataFile;
+    immutable string residualMetadataFile;
+    immutable string gradientMetadataFile;
+    immutable string restartFile;
+    immutable string timesFile;
+    immutable string referenceResidualsFile;
+    immutable string fluidPrefix;
+    immutable string solidPrefix;
+    immutable string limiterPrefix;
+    immutable string residualPrefix;
+    immutable string gradientPrefix;
+    immutable string loadsDir;
+    immutable string loadsPrefix;
+    immutable string gridPrefix;
+    immutable string gridDir;
+    immutable string gridDirectory;
+    immutable string gridMetadataFile;
+    immutable string savedSgridDir;
+    immutable string gzipExt;
+    immutable string blkListFile;
+    immutable string vtkDir;
+    immutable string mpimapFile;
+    immutable string mappedCellsFile;
+    immutable string transResidFile;
+    immutable string dblVarFmt;
+    immutable string revisionId;
+    immutable string fullRevisionId;
+    immutable string revisionDate;
+    immutable string buildDate;
+    immutable string compilerName = std.compiler.name 
+        ~ format(" v%d.%d", std.compiler.version_major, std.compiler.version_minor);
 };
 
 LmrCfg lmrCfg;
@@ -114,7 +116,12 @@ static this()
     lmrCfg.transResidFile = lmrCfg.simDir ~ "/" ~ lmrJSONCfg["transient-residuals-filename"].str;
     lmrCfg.dblVarFmt = lmrJSONCfg["double-var-format"].str;
 
-
+    JSONValue buildInfo = parseJSON(import("build-info.json"));
+    
+    lmrCfg.revisionId = buildInfo.getJSONstring("revisionId", "BLANK");
+    lmrCfg.fullRevisionId = buildInfo.getJSONstring("fullRevisionId", "BLANK");
+    lmrCfg.revisionDate = buildInfo.getJSONstring("revisionDate", "BLANK");
+    lmrCfg.buildDate = buildInfo.getJSONstring("buildDate", "BLANK");
 }
 
 /**
