@@ -15,6 +15,7 @@ local FlowState_defaults = {
    -- the following couple of attributes
    massf = {["air"]=1.0, }, -- mass fractions
    T_modes = {}, -- temperatures for other internal energy modes, K
+   Qrad = 0.0,
    --
    mu = 0.0,
    k = 0.0,
@@ -53,7 +54,7 @@ function FlowState:new(o)
                                  "quality", "massf",
                                  "velx", "vely", "velz",
                                  "Bx", "By", "Bz", "psi", "divB",
-                                 "tke", "omega", "nuhat", "mu_t", "k_t", "S"})
+                                 "tke", "omega", "nuhat", "mu_t", "k_t", "S", "Qrad"})
    if not flag then
       error("Invalid name for item supplied to FlowState constructor.", 2)
    end
@@ -138,6 +139,7 @@ function FlowState:new(o)
    o.a = Q.a
    o.mu = Q.mu
    o.k = Q.k
+   o.Qrad = Q.Qrad
    o.turb = initTurbulence(o, config.turbulence_model)
    setmetatable(o, self)
    self.__index = self

@@ -1,0 +1,10 @@
+{
+	"fileVersion": 1,
+	"versions": {
+		"ceq": {"path":"../extern/ceq"},
+		"dyaml": {"path":"../extern/D-YAML"},
+		"gdtk": {"path":".."},
+		"gzip": {"path":"../extern/gzip"},
+		"tinyendian": "0.2.0"
+	}
+}

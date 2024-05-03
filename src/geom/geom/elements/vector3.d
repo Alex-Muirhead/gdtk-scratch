@@ -578,6 +578,12 @@ Vector3 cross(in Vector3 v1, in Vector3 v2)
     return v3;
 }
 
+@nogc
+number wedge2D(in Vector3 v1, in Vector3 v2)
+{
+    return v1.x*v2.y - v2.x*v1.y;
+}
+
 /**
  * Component forms
  */
@@ -586,6 +592,12 @@ Vector3 cross(in Vector3 v1, in Vector3 v2)
 number dot_product(number ax, number ay, number az, number bx, number by, number bz)
 {
     return ax*bx + ay*by + az*bz;
+}
+
+@nogc
+number wedge_product_2d(number ax, number ay, number bx, number by)
+{
+    return ax*by - bx*ay;
 }
 
 @nogc
