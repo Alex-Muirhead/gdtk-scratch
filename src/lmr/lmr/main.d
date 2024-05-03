@@ -18,7 +18,7 @@ import lmr.commands.prepreactions;
 import lmr.commands.prepgrids;
 import lmr.commands.prepsim;
 import lmr.commands.prepmappedcells;
-import lmr.commands.runsim;
+import lmr.commands.runsim : delegateAndExecute, runCmd, NumberType;
 import lmr.commands.snapshot2vtk;
 import lmr.commands.structured2unstructured;
 import lmr.commands.revisionid;
@@ -150,7 +150,7 @@ int main(string[] args)
     if (cmd == "run") {
         // We need to treat this one specially because of how delegation
         // is made based on number type (real or complex)
-        return runsim.delegateAndExecute(args, numberType);
+        return delegateAndExecute(args, numberType);
     }
 
     if (cmd in commands) {
