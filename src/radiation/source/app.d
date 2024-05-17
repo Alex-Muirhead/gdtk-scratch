@@ -72,12 +72,15 @@ FVInterface marching_efficient(
             faces: foreach (n, iface; currentCell.iface) {
                 vertex_i = iface.vtx[0].pos[gtl];
                 vertex_j = iface.vtx[1].pos[gtl];
+                // Need to ensure the interface is moving anti-clockwise with 
+                // respect to the cell interior
                 if (currentCell.outsign[n] == -1) {
                     swap(vertex_i, vertex_j);
                 } 
 
                 Vector3 toVertex = rayCoord - vertex_i;
                 // NOTE: Could potentially use iface.t1 for this?
+                //       Probably not, since we need a non-normalised vec 
                 Vector3 faceTangent = vertex_j - vertex_i;
 
                 number alignment = wedge2D(faceTangent, rayTangent);
@@ -255,12 +258,12 @@ void main(string[] args) {
     auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
 
     auto decay = 0.5;
-    auto firstBlock = localFluidBlocks[0];
-    uint angleSamples = 8;
+    auto block = localFluidBlocks[0];
+    uint angleSamples = 100;
 
     number baseEmission = StefanBoltzmann_constant * 280 ^^ 4;
 
-    outer: foreach (cell_id, ref origin; firstBlock.cells) {
+    outer: foreach (cell_id, ref origin; block.cells) {
 
         // auto angle = uniform(0.0f, 2*PI, rng);
         number fullEmission = origin.volume[0] * StefanBoltzmann_constant * origin.fs.gas.T ^^ 4;
@@ -277,40 +280,35 @@ void main(string[] args) {
 
             size_t[] rayCells;
             number[] rayLengths;
-            // FVInterface hit = marching_full(cell_id, firstBlock, direction, rayCells, rayLengths);
-            FVInterface hit = marching_efficient(cell_id, firstBlock, direction, rayCells, rayLengths);
-            writeln("Interface: ", hit);
-            continue;
+            // FVInterface inter = marching_full(cell_id, firstBlock, direction, rayCells, rayLengths);
+            FVInterface inter = marching_efficient(cell_id, block, direction, rayCells, rayLengths);
 
-            //     if (!inter.is_on_boundary) {
-            //         writeln("Neighbouring cell: ", neighbour);
-            //         throw new Exception("Ray hit a ghost cell not attached to a boundary");
-            //         continue;
-            //     }
+            // Try and handle ghost cells
+            BoundaryCondition boundary = block.bc[inter.bc_id];
+            if (boundary.preReconAction.length > 0) {
+                writeln("Boundary type: ", boundary.type);
+                auto mygce = cast (GhostCellFullFaceCopy) boundary.preReconAction[0];
+                if (mygce) {
+                    // We have a full face copy, does this only exist for structured?
+                    // I think we use `GhostCellMappedCopy` for unstructured...
+                    // QUESTION: Are there other effects that mean we walk across the boundary?
 
-            //     BoundaryCondition boundary = block.bc[inter.bc_id];
-            //     auto mygce = cast (GhostCellFullFaceCopy) boundary.preReconAction[0];
-            //     if (mygce) {
-            //         // We have a full face copy, does this only exist for structured?
-            //         // I think we use `GhostCellMappedCopy` for unstructured...
-            //         // QUESTION: Are there other effects that mean we walk across the boundary?
+                    // NOTE: We should always intersect the 0th (first) layer of the ghost cells
+                    //       in the boundary. Since ghost cells are added walking away from the
+                    //       boundary, this means we can multiply the `i_bndry` by the number
+                    //       of ghost cell layers to get the correct position of the ghost cells
+                    //       and consequently the mapped cell.
+                    size_t boundaryCellID = inter.i_bndry * block.n_ghost_cell_layers;
+                    FluidFVCell mappedCell = mygce.mapped_cells[boundaryCellID];
+                    writeln("Cell ", rayCells[$-1], " maps to ", mappedCell.id);
+                }
+            }
 
-            //         // NOTE: We should always intersect the 0th (first) layer of the ghost cells
-            //         //       in the boundary. Since ghost cells are added walking away from the
-            //         //       boundary, this means we can multiply the `i_bndry` by the number
-            //         //       of ghost cell layers to get the correct position of the ghost cells
-            //         //       and consequently the mapped cell.
-            //         size_t boundaryCellID = inter.i_bndry * block.n_ghost_cell_layers;
-            //         FluidFVCell mappedCell = mygce.mapped_cells[boundaryCellID];
-            //         writeln("Cell ", currentCell.id, " maps to ", mappedCell.id);
-            //     }
-            //     continue;
-            // }
             number heating;
             foreach (i; 0 .. rayCells.length) {
                 heating = rayStrength * (1 - (1 - decay) ^^ rayLengths[i]);
                 rayStrength -= heating;
-                firstBlock.cells[rayCells[i]].fs.Qrad += heating;
+                block.cells[rayCells[i]].fs.Qrad += heating;
             }
         }
         break outer;
