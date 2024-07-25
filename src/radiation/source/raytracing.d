@@ -32,7 +32,7 @@ Grid get_grid(FluidBlock block) {
 }
 
 
-void trace_rays(FluidBlock block, number absorbtivity) {
+void trace_rays(FluidBlock block, number absorptivity) {
     auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
     uint angleSamples = 100;
 
@@ -82,7 +82,7 @@ void trace_rays(FluidBlock block, number absorbtivity) {
 
             number heating;
             foreach (i; 0 .. rayCells.length) {
-                heating = rayStrength * (1 - (1 - absorbtivity) ^^ rayLengths[i]);
+                heating = rayStrength * (1 - (1 - absorptivity) ^^ rayLengths[i]);
                 rayStrength -= heating;
                 block.cells[rayCells[i]].fs.Qrad += heating;
             }
