@@ -38,6 +38,8 @@ import lmr.coredata : FluidCellData;
 import kinetics.chemistry_update;
 import kinetics.reaction_mechanism;
 
+import gas.physical_constants : StefanBoltzmann_constant;
+
 version(debug_chem) {
     GasState savedGasState;
 }
@@ -1360,6 +1362,16 @@ public:
     {
         Q_rE_rad = 0.0;
     } // end reset_Q_rad_to_zero()
+
+    /** 
+     * Returns: The black-body *intensity* of a grey gas with units of W/m^2/sr
+     */
+    @nogc
+    number grey_blackbody_intensity() {
+        number T = fs.gas.T;
+        number emissive_power = StefanBoltzmann_constant * T ^^ 4;
+        return emissive_power / std.math.PI;
+    }
 
     @nogc
     number rad_scaling_ratio()
