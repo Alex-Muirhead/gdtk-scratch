@@ -34,6 +34,15 @@ uint face_index(string name)
     }
 } // end face_index
 
+uint opposite_face(uint index) {
+    switch (index) {
+    case 0: .. case 5: 
+        return index ^ 1;
+    default:
+        throw new Error(text("Invalid face index: ", index));
+    }
+}
+
 // VTK cell types, for use when writing and reading VTK files.
 // With wedge and pyramid items from SU2 Mesh File documentation.
 enum VTKElement {
