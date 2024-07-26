@@ -5,7 +5,7 @@ import std.math : cos, sin, PI, pow, exp, fabs;
 import std.stdio;
 import std.getopt;
 
-import geom.elements.nomenclature : Face;
+import geom.elements.nomenclature : Face, opposite_face;
 import gas.physical_constants : StefanBoltzmann_constant;
 import geom.elements.vector3 : Vector3, distance_between;
 import nm.number;
@@ -84,78 +84,64 @@ void main(string[] args) {
     string dirName = snapshotDirectory(nWrittenSnapshots);
     ensure_directory_is_present(dirName);
 
-    double absorptionCoefficient = 0.5;
+    double absorptionCoefficient = 5.0;
     FluidBlock block = localFluidBlocks[0];
-    // trace_rays(block, decay);
 
-    BoundaryCondition capsuleWall = block.bc[Face.east];
-    size_t direction = Face.west;
+    uint wallSide = Face.west;
+    uint direction = opposite_face(wallSide);
+    BoundaryCondition capsuleWall = block.bc[wallSide];
 
     foreach (n, iface; capsuleWall.faces) {
-        FluidFVCell cell = iface.left_cell;
-        FluidFVCell[] tangentLine = [cell];
 
-        // Keep track of the optical distances for the faces of each cell
-        number opticalCoordinate = 0.0;
-        number[] opticalCoordinates = [opticalCoordinate];
-
-        number[] cellIntensity = [cell.grey_blackbody_intensity()];
-        number[] cellHeatFlux = [];
-        Vector3 lastPosition = cell.iface[Face.east].pos;
-        Vector3 nextPosition;
-
-        while (true) {
-            nextPosition = cell.iface[direction].pos;
-            // Absorption coefficient might change with temperature in the future
-            opticalCoordinate += absorptionCoefficient * distance_between(nextPosition, lastPosition);
-            opticalCoordinates ~= opticalCoordinate;
-
-            if (cell.iface[direction].is_on_boundary) {
-                // This appears to be the best way to check if we hit an edge
-                // But it will also trigger if we cross a block boundary
-                break;
-            }
-            // Cell cloud is offset by 1, as the cloud contains the cell itself
-            cell = cell.cell_cloud[direction+1];
-
-            tangentLine ~= cell;
-            cellIntensity ~= cell.grey_blackbody_intensity();
-
-            swap(nextPosition, lastPosition);
-        }
-
-        number heatFlux;
-        number cellCenter;
-        number edgeOne;
-        number edgeTwo;
-        number dropOff;
+        // Start tangent trace routine
         
-        foreach (i, ref c; tangentLine) {
-            heatFlux = 0.0;
-            cellCenter = (opticalCoordinates[i] + opticalCoordinates[i+1]) / 2;
-            foreach (j, ref _c; tangentLine) {
-                edgeOne = fabs(cellCenter - opticalCoordinates[j]);
-                edgeTwo = fabs(cellCenter - opticalCoordinates[j+1]);
-                if (j < i) {
-                    // j+1 is closer than j
-                    dropOff = exponential_integral(edgeTwo) - exponential_integral(edgeOne);
-                } else if (j > i) {
-                    // j is closer than j+1
-                    dropOff = exponential_integral(edgeOne) - exponential_integral(edgeTwo);
-                } else {
-                    // In the same cell (i == j)       
-                    dropOff = 0;
-                }
-                heatFlux += cellIntensity[j] * dropOff;
-            }
-            cellHeatFlux ~= heatFlux;
-            c.fs.Qrad = heatFlux;
+        size_t[] crossed = [];
+        number[] lengths = [];
 
+        // naive_tangent_marching(iface.left_cell.id, block, direction, crossed, lengths);
+        // NOTE: Need to switch interface SIDE and normal SIGN when going from West to East etc.
+        marching_efficient(iface.right_cell.id, block, iface.n, crossed, lengths);
+
+        // End tangent trace routine
+
+        number[] cellIntensity = [];
+        number[] opticalThickness = [];
+
+        for (auto i = 0; i < crossed.length; i++) {
+            // NOTE: Absorption coefficient might be temperature dependent
+            opticalThickness ~= absorptionCoefficient * lengths[i];
+            cellIntensity ~= block.cells[crossed[i]].grey_blackbody_intensity();
         }
+        
+        number heatFlux;
+        number halfThickness;
+        number opticalDistance;
 
-        // DEBUG printing
-        if (n < 5) {
-            writeln("Optical distances from wall: ", opticalCoordinates);
+        foreach (i, cellID; crossed) {
+            // Do self-heating case here (i == j)
+            halfThickness = opticalThickness[i] / 2;
+            heatFlux = cellIntensity[i] * (1 - 2 * exponential_integral(halfThickness));
+
+            // Walk away from cell i (along negative coordinate)
+            opticalDistance = halfThickness;
+            for (auto j = long(i) - 1; j >= 0; --j) {
+                heatFlux += cellIntensity[j] * (
+                    exponential_integral(opticalDistance) - 
+                    exponential_integral(opticalDistance + opticalThickness[j])
+                );
+                opticalDistance += opticalThickness[j];
+            }
+            // Walk away from cell i (along positive coordinate)
+            opticalDistance = halfThickness;
+            for (auto j = i + 1; j < crossed.length; ++j) {
+                heatFlux += cellIntensity[j] * (
+                    exponential_integral(opticalDistance) -
+                    exponential_integral(opticalDistance + opticalThickness[j]) 
+                );
+                opticalDistance += opticalThickness[j];
+            }
+
+            block.cells[cellID].fs.Qrad = heatFlux;
         }
     }
 
@@ -170,4 +156,28 @@ void main(string[] args) {
         }
         fluidBlkIO.writeVariablesToFile(fileName, cells);
     }
+}
+
+FVInterface naive_tangent_marching(
+    size_t cellID, FluidBlock block, uint rayDirection,
+    ref size_t[] crossed, ref number[] lengths
+) {
+    FluidFVCell currentCell = block.cells[cellID];
+    // Grid currentGrid = get_grid(block); // NOTE: Could use the grid for direction?
+
+    while (true) {
+        crossed ~= currentCell.id;
+        lengths ~= distance_between(
+            currentCell.iface[rayDirection].pos, 
+            currentCell.iface[opposite_face(rayDirection)].pos);
+
+        // This appears to be the best way to check if we hit an edge
+        // But it will also trigger if we cross a block boundary
+        if (currentCell.iface[rayDirection].is_on_boundary) { break; }
+
+        // Cell cloud is offset by 1, as the cloud contains the cell itself
+        currentCell = currentCell.cell_cloud[rayDirection+1];
+    }
+
+    return currentCell.iface[rayDirection];
 }
