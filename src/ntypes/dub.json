@@ -9,5 +9,16 @@
 	"license": "BSL-1.0",
 	"name": "ntypes",
 	"sourcePaths": ["."],
-	"importPaths": ["."]
+	"importPaths": ["."],
+	"targetType": "library",
+	"configurations": [
+		{
+			"name": "library",
+		},
+		{
+			"name": "unittest",
+			"dependencies": { "silly": "~>1.1.1" },
+			"versions": [ "complex_numbers" ]
+		}
+	]
 }

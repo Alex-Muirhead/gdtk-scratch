@@ -25,7 +25,7 @@
 			"name": "gascalc",
 			"targetType": "executable",
 			"targetName": "gascalc",
-			"mainSourceFile": "gas_calc.d"
+			"mainSourceFile": "gas/gas_calc.d",
 		},
 	],
 	"preGenerateCommands": ["cd gas && make -s ideal_air_fortran.o"]

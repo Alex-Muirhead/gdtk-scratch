@@ -17,19 +17,4 @@
 		"gdtk:nm"    : { "path": ".." },
 		"gdtk:util"  : { "path": ".." }
 	}, 
-	"configurations": [
-		{
-			"name": "sourceLibrary", 
-			"excludedSourceFiles": [
-				"kinetics/pseudo_species_kinetics.d",
-				"kinetics/dvode.o",
-				"kinetics/pseudosp_solve_ode.o",
-				"kinetics/pseudosp_rhs_ode.o",
-				"kinetics/luapseudo_species_kinetics.d",
-			]
-		},
-		{
-			"name": "with-dvode"
-		}
-	]
 }
