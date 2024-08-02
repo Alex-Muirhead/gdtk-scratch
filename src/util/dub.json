@@ -23,5 +23,11 @@
 			],
 			"preGenerateCommands": ["make -s"]
 		}
+	],
+	"configurations": [
+		{
+			"name": "unittest",
+			"dependencies": { "silly": "~>1.1.1" }
+		}
 	]
 }
