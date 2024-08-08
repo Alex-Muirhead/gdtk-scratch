@@ -1,5 +1,9 @@
 # makefile for the gas module
 
+REPO_DIR := ../..
+BUILD_DIR := $(REPO_DIR)/build
+SRC_ROOT := $(REPO_DIR)/src
+
 DMD ?= ldc2
 
 # FLAVOUR options are debug, fast, profile
@@ -14,8 +18,9 @@ else
 endif
 # $(info PLATFORM=$(PLATFORM))
 
+VPATH = gas:gas/species-database
 INSTALL_DIR ?= $(HOME)/gdtkinst
-BUILD_DIR := ../../../build
+BUILD_DIR := ../../build
 
 DEMO_PROGRAMS := gas_model_demo ideal_gas_demo luagas_model_demo
 
@@ -37,33 +42,33 @@ TEST_PROGRAMS := chemkin_therm_cond_test chemkin_viscosity_test cea_therm_cond_t
 	vib_specific_co_mixture_test \
 	two_temperature_gasgiant_test multi_temperature_gas_test
 
-LUA_DIR := ../../../extern/lua-5.4.3
+LUA_DIR := $(REPO_DIR)/extern/lua-5.4.3
 LIBLUA := $(LUA_DIR)/install/lib/liblua.a
 LIBLUAPATH := $(LUA_DIR)/lib
 
-CEQ_DIR := ../../extern/ceq/source
+CEQ_DIR := ../extern/ceq
 LIBCEQ := $(CEQ_DIR)/libceq.a
 include $(CEQ_DIR)/ceq_files.mk
 
-NTYPES_DIR := ../../ntypes/ntypes
-NTYPES_FILES := $(NTYPES_DIR)/complex.d
+NTYPES_DIR := ../ntypes
+include $(NTYPES_DIR)/ntypes_files.mk
 
-UTIL_DIR := ../../util/util
+UTIL_DIR := ../util
 include $(UTIL_DIR)/util_files.mk
 
-NM_DIR := ../../nm/nm
+NM_DIR := ../nm
 include $(NM_DIR)/nm_files.mk
 
-KINETICS_DIR := ../../kinetics/kinetics
+KINETICS_DIR := ../kinetics
 include $(KINETICS_DIR)/kinetics_files.mk
 
-GASDYN_DIR := ../../gasdyn/gasdyn
+GASDYN_DIR := ../gasdyn
 include $(GASDYN_DIR)/gasdyn_files.mk
 
-GEOM_DIR := ../../geom/geom
+GEOM_DIR := ../geom
 include $(GEOM_DIR)/geom_files.mk
 
-GZIP_DIR := ../../extern/gzip
+GZIP_DIR := ../extern/gzip
 GZIP_FILES := $(GZIP_DIR)/gzip.d
 
 include gas_files.mk
@@ -142,20 +147,20 @@ DFLAGS += -dip1008 -preview=in
 # Here begins the list of targets, starting with the top-level actions.
 # ----------------------------------------------------------------------
 
-CIF_DIR := species-database/collision-integrals
+CIF_DIR := collision-integrals
 COLLISION_INTEGRAL_FILES := $(CIF_DIR)/gupta_etal_1990_CI_data.lua \
 	$(CIF_DIR)/wright_etal_CI_data.lua
 
 # prep-gas and its database is required by the Eilmer flow solver.
-build-prep-gas: prep_gas.lua species-database/species-database.lua \
-		species-database/species-list.txt species_data_converter.lua $(COLLISION_INTEGRAL_FILES)
+build-prep-gas: prep_gas.lua species-database.lua \
+		species-list.txt species_data_converter.lua $(COLLISION_INTEGRAL_FILES)
 	- mkdir -p $(BUILD_DIR)/bin
 	cp prep_gas.lua $(BUILD_DIR)/bin/prep-gas; chmod +x $(BUILD_DIR)/bin/prep-gas
 	cp species_data_converter.lua $(BUILD_DIR)/bin/species-data-converter; \
 		chmod +x $(BUILD_DIR)/bin/species-data-converter
 	- mkdir -p $(BUILD_DIR)/data
-	cp species-database/species-database.lua $(BUILD_DIR)/data/
-	cp species-database/species-list.txt $(BUILD_DIR)/data/
+	cp species-database.lua $(BUILD_DIR)/data/
+	cp species-list.txt $(BUILD_DIR)/data/
 	cp $(COLLISION_INTEGRAL_FILES) $(BUILD_DIR)/data/
 
 # The following are not required by the Eilmer flow solver but
@@ -218,7 +223,7 @@ gas-calc: gas_calc.d $(LIBLUA) $(GAS_FILES) $(GAS_LUA_FILES) \
 	$(KINETICS_FILES) $(KINETICS_LUA_FILES) \
 	$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(GEOM_FILES) $(GZIP_FILES) \
 	$(CEQ_SRC_FILES) $(LIBCEQ) $(LIBLUA)
-	$(DMD) $(OF)gas-calc $(DFLAGS) gas_calc.d \
+	$(DMD) $(OF)gas-calc $(DFLAGS) $< \
 		$(GAS_FILES) $(GAS_LUA_FILES) \
 		$(NM_FILES) $(NTYPES_FILES) $(NM_LUA_FILES) $(UTIL_FILES) \
 		$(KINETICS_FILES) $(KINETICS_LUA_FILES) \
@@ -245,8 +250,8 @@ $(LIBLUA):
 $(LIBCEQ):
 	cd $(CEQ_DIR); make
 
-species-database/species-database.lua :
-	cd species-database; make species-database.lua
+species-database.lua :
+	cd gas/species-database; make species-database.lua
 
 # Some demo targets. These are left over from the early days of development.
 
