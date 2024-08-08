@@ -352,8 +352,8 @@ version(equilibrium_update_test) {
     import gas.therm_perf_gas;
 
     int main() {
-        auto gm = new ThermallyPerfectGasEquilibrium("../gas/sample-data/therm-perf-equil-5-species-air.lua");
-        auto reactor = new EquilibriumUpdate("../gas/sample-data/therm-perf-equil-5-species-air.lua", gm);
+        auto gm = new ThermallyPerfectGasEquilibrium("../../gas/gas/sample-data/therm-perf-equil-5-species-air.lua");
+        auto reactor = new EquilibriumUpdate("../../gas/gas/sample-data/therm-perf-equil-5-species-air.lua", gm);
 
         auto gs2 = GasState(5, 0);
         double rho_target = 0.0139638507337;

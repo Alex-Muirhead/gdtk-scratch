@@ -1,3 +1,0 @@
-GRID_DIR ?= .
-
-GRID_FILES := 

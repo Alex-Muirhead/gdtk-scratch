@@ -12,13 +12,14 @@ else
 endif
 $(info PLATFORM=$(PLATFORM))
 
+VPATH = gasdyn
 DEMO_PROGRAMS := idealgasflow_demo luaidealgasflow_demo \
 	gasflow_demo luagasflow_demo
 
 include gasdyn_files.mk
 
 NTYPES_DIR := ../ntypes
-NTYPES_FILES := $(NTYPES_DIR)/complex.d
+include $(NTYPES_DIR)/ntypes_files.mk
 
 GZIP_DIR := ../extern/gzip
 GZIP_FILES := $(GZIP_DIR)/gzip.d

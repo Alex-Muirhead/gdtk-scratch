@@ -1,5 +1,5 @@
 
-LMR ?= .
+LMR ?= lmr
 LMR_CMD = $(LMR)/commands
 LMR_LUA_MOD = $(LMR)/lua-modules
 LMR_LUA_WRAP = $(LMR)/luawrap

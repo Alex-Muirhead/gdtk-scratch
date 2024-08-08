@@ -2,38 +2,42 @@ CC = gcc
 CFLAGS := -I. -fPIC -Wall -std=c99 -O3
 INSTALL_DIR ?= $(HOME)/eqc
 
+VPATH = source
+
 .PHONY: objects all clean install
 
-objects: thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o eqc.o
+OBJECTS := thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o eqc.o
 
-all: objects
-	$(CC) $(CFLAGS) -shared thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o eqc.o -lm -o libeqc.so
-	ar r libeqc.a thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o eqc.o
+all: $(OBJECTS)
+	$(CC) $(CFLAGS) -shared $^ -lm -o libeqc.so
+	ar r libeqc.a $^
 	ranlib libeqc.a
 
+objects: $(OBJECTS)
+
 thermo.o: thermo.c thermo.h
-	$(CC) $(CFLAGS) -c thermo.c
+	$(CC) $(CFLAGS) -c $<
 
 linalg.o: linalg.c linalg.h
-	$(CC) $(CFLAGS) -c linalg.c
+	$(CC) $(CFLAGS) -c $<
 
 common.o: common.c common.h
-	$(CC) $(CFLAGS) -c common.c
+	$(CC) $(CFLAGS) -c $<
 
 pt.o: pt.c thermo.h linalg.h common.h pt.h
-	$(CC) $(CFLAGS) -c pt.c
+	$(CC) $(CFLAGS) -c $<
 
 rhou.o: rhou.c thermo.h linalg.h common.h rhou.h
-	$(CC) $(CFLAGS) -c rhou.c
+	$(CC) $(CFLAGS) -c $<
 
 ps.o: ps.c thermo.h linalg.h common.h ps.h
-	$(CC) $(CFLAGS) -c ps.c
+	$(CC) $(CFLAGS) -c $<
 
 rhot.o: rhot.c thermo.h linalg.h common.h rhot.h
-	$(CC) $(CFLAGS) -c rhot.c
+	$(CC) $(CFLAGS) -c $<
 
 eqc.o: eqc.c thermo.h pt.h rhou.h ps.h rhot.h eqc.h
-	$(CC) $(CFLAGS) -c eqc.c
+	$(CC) $(CFLAGS) -c $<
 
 install: 
 	mkdir -p $(INSTALL_DIR)
