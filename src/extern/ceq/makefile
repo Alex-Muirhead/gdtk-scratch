@@ -2,38 +2,42 @@ CC = gcc
 CFLAGS := -I. -fPIC -Wall -std=c99 -O3
 INSTALL_DIR ?= $(HOME)/ceq
 
+VPATH = source
+
 .PHONY: objects all clean install
 
-objects: thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o ceq.o
+OBJECTS := thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o ceq.o
 
-all: objects
-	$(CC) $(CFLAGS) -shared thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o ceq.o -lm -o libceq.so
-	ar r libceq.a thermo.o linalg.o common.o pt.o rhou.o ps.o rhot.o ceq.o
+all: $(OBJECTS)
+	$(CC) $(CFLAGS) -shared $^ -lm -o libceq.so
+	ar r libceq.a $^
 	ranlib libceq.a
 
+objects: $(OBJECTS)
+
 thermo.o: thermo.c thermo.h
-	$(CC) $(CFLAGS) -c thermo.c
+	$(CC) $(CFLAGS) -c $<
 
 linalg.o: linalg.c linalg.h
-	$(CC) $(CFLAGS) -c linalg.c
+	$(CC) $(CFLAGS) -c $<
 
 common.o: common.c common.h
-	$(CC) $(CFLAGS) -c common.c
+	$(CC) $(CFLAGS) -c $<
 
 pt.o: pt.c thermo.h linalg.h common.h pt.h
-	$(CC) $(CFLAGS) -c pt.c
+	$(CC) $(CFLAGS) -c $<
 
 rhou.o: rhou.c thermo.h linalg.h common.h rhou.h
-	$(CC) $(CFLAGS) -c rhou.c
+	$(CC) $(CFLAGS) -c $<
 
 ps.o: ps.c thermo.h linalg.h common.h ps.h
-	$(CC) $(CFLAGS) -c ps.c
+	$(CC) $(CFLAGS) -c $<
 
 rhot.o: rhot.c thermo.h linalg.h common.h rhot.h
-	$(CC) $(CFLAGS) -c rhot.c
+	$(CC) $(CFLAGS) -c $<
 
 ceq.o: ceq.c thermo.h pt.h rhou.h ps.h rhot.h ceq.h
-	$(CC) $(CFLAGS) -c ceq.c
+	$(CC) $(CFLAGS) -c $<
 
 install: 
 	mkdir -p $(INSTALL_DIR)
