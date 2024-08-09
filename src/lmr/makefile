@@ -55,7 +55,7 @@ MPI_FILES = $(OPENMPI_FILES)
 MPICH_DIR := ../extern/cray-mpich
 MPICH_FILES := $(MPICH_DIR)/mpi.d
 
-PROGRAMS := lmr gdtk-module
+PROGRAMS := lmr-entry gdtk-module
 SUB_PROGRAMS := lmr-run lmrZ-run
 ifeq ($(OPT_OUT_MPI), 0)
 	SUB_PROGRAMS += lmr-mpi-run lmrZ-mpi-run
@@ -79,12 +79,14 @@ AUX_PROGRAMS := prep-gas ugrid_partition prep-chem chemkin2eilmer prep-kinetics
 MPI_LIBRARY_DIRS = $(shell mpicc --showme:libdirs)
 MPI_LIB_DIRS_SEARCH = $(foreach d, $(MPI_LIBRARY_DIRS), -L-L$d)
 
+VPATH = lmr:lmr/commands
 include lmr-files.mk
 
 UTIL_DIR := ../util
 include $(UTIL_DIR)/util_files.mk
 
 NM_DIR := ../nm
+NM_PACKAGE := nm
 include $(NM_DIR)/nm_files.mk
 
 NML_DIR := ../lib
@@ -98,20 +100,23 @@ GRID_DIR := ../grid_utils
 include $(GRID_DIR)/grid_utils_files.mk
 
 KINETICS_DIR := ../kinetics
+KINETICS_PACAKGE = kinetics
 include $(KINETICS_DIR)/kinetics_files.mk
 
 GEOM_DIR := ../geom
+GEOM_PACKAGE = geom
 include $(GEOM_DIR)/geom_files.mk
 
 GASDYN_DIR := ../gasdyn
 include $(GASDYN_DIR)/gasdyn_files.mk
 
-CEQ_DIR := ../extern/ceq/source
+CEQ_DIR := ../extern/ceq
 LIBCEQ := $(CEQ_DIR)/libceq.a
 include $(CEQ_DIR)/ceq_files.mk
 
 NTYPES_DIR := ../ntypes
-NTYPES_FILES := $(NTYPES_DIR)/complex.d
+NTYPES_PACKAGE := ntypes
+include $(NTYPES_DIR)/ntypes_files.mk
 
 GZIP_DIR := ../extern/gzip
 GZIP_FILES := $(GZIP_DIR)/gzip.d
@@ -236,6 +241,10 @@ endif
 DFLAGS += -dip1008
 DFLAGS += -I.. -I$(NM_DIR) -I$(UTIL_DIR) -I$(GEOM_DIR) -I$(GRID_DIR) -I$(GZIP_DIR)
 
+ # Newton Krylov enabled by default for lmr
+
+ DFLAGS += $(DVERSION)newton_krylov
+
 ifeq ($(DEBUG_CHEM),1)
     DFLAGS += $(DVERSION)debug_chem
 endif
@@ -262,7 +271,9 @@ endif
 
 default: $(PROGRAMS) $(SUB_PROGRAMS)
 
-install: $(PROGRAMS) $(SUB_PROGRAMS) $(PY_PROGRAMS) $(AUX_PROGRAMS)
+install: $(PROGRAMS) $(SUB_PROGRAMS) $(PY_PROGRAMS) #  $(AUX_PROGRAMS)
+	- mkdir -p $(BUILD_DIR)/bin
+	- mkdir -p $(BUILD_DIR)/lib
 	- mkdir -p $(INSTALL_DIR)/bin
 	- mkdir -p $(INSTALL_DIR)/lib
 	- mkdir -p $(INSTALL_DIR)/etc
@@ -270,8 +281,8 @@ install: $(PROGRAMS) $(SUB_PROGRAMS) $(PY_PROGRAMS) $(AUX_PROGRAMS)
 	cp $(PROGRAMS) $(INSTALL_DIR)/bin
 	cp $(SUB_PROGRAMS) $(INSTALL_DIR)/bin
 	cp $(PY_PROGRAMS) $(INSTALL_DIR)/bin
-	cp lua-modules/*.lua $(INSTALL_DIR)/lib/
-	cp lmr.cfg $(INSTALL_DIR)/etc/
+	cp lmr/lua-modules/*.lua $(INSTALL_DIR)/lib/
+	cp lmr/lmr.cfg $(INSTALL_DIR)/etc/
 	cp $(LUA_DIR)/install/bin/* $(BUILD_DIR)/bin
 	cp $(LUA_DIR)/install/lib/lpeg.so $(BUILD_DIR)/lib
 	cp -r ../lib/* $(BUILD_DIR)/lib
@@ -286,15 +297,13 @@ clean:
 	- rm $(PROGRAMS)
 	- rm $(SUB_PROGRAMS)
 	- rm $(PY_PROGRAMS)
-	- rm lmrconfig_with_str_subst.d
-	- rm runsim_shared.d runsim_mpi.d
 	- rm -f gdtk-module
 	- cd $(OPENMPI_DIR); make clean
 	- cd $(MPICH_DIR); make clean
 	- cd $(LUA_DIR); make clean
 	- cd $(GEOM_DIR); make clean
 	- cd $(GZIP_DIR); make clean
-	- cd $(GAS_DIR); make clean; rm -f libgas.a
+	- cd $(GAS_DIR); make clean
 	- cd $(KINETICS_DIR); make clean
 	- cd $(GRID_DIR); make clean
 	- cd $(CEQ_DIR); make clean
@@ -316,187 +325,54 @@ lmrconfig_with_str_subst.d: lmrconfig.d
 		-e 's/PUT_BUILD_DATE_HERE/$(BUILD_DATE)/' \
 		$< > $@
 
-lmr: main.d lmrconfig_with_str_subst.d $(LMR_CORE_FILES) $(LMR_CMD_FILES) $(LMR_LUA_FILES) \
-	$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-	$(GEOM_FILES) $(GRID_FILES) \
-	$(GAS_FILES) $(CEQ_SRC_FILES) $(LIBCEQ) $(LIBLUA) $(GZIP_FILES) \
-	$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-	$(NM_FILES) $(NTYPES_FILES) $(UTIL_FILES) \
-	$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-	$(DYAML_FILES) $(TINYENDIAN_FILES)
-	$(DMD) $(FLAVOUR_FLAGS) $(DFLAGS) $(OF)$@ \
-		$(DVERSION)newton_krylov \
-		main.d \
-		lmrconfig_with_str_subst.d \
-		$(LMR_CORE_FILES) $(LMR_CMD_FILES) $(LMR_LUA_FILES) \
-		$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-		$(GEOM_FILES) $(GRID_FILES) \
-		$(GAS_FILES) $(CEQ_SRC_FILES) $(GZIP_FILES) \
-		$(UTIL_FILES) $(NM_FILES) $(NTYPES_FILES) \
-		$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-		$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-		$(LIBCEQ) $(LIBLUA) \
-		$(DYAML_FILES) $(TINYENDIAN_FILES) \
-		$(DLINKFLAGS)
+LMR_SRC_DEPS := $(LMR_CORE_FILES) \
+	$(LMR_BC_FILES) $(LMR_CMD_FILES) $(LMR_EFIELD_FILES) $(LMR_SOLID_FILES) \
+	$(CEQ_SRC_FILES) $(DYAML_FILES) $(GASDYN_FILES) $(GAS_FILES) \
+	$(GEOM_FILES) $(GRID_FILES) $(GZIP_FILES) $(KINETICS_FILES) \
+	$(LIBCEQ) $(NM_FILES) $(NTYPES_FILES) $(TINYENDIAN_FILES) $(UTIL_FILES)
+	
+LMR_LUA_DEPS := $(GAS_LUA_FILES) $(GASDYN_LUA_FILES) $(LMR_LUA_FILES) \
+	$(LIBLUA) $(KINETICS_LUA_FILES) $(NM_LUA_FILES)
 
-lmr-run: lmrconfig_with_str_subst.d $(LMR_CORE_FILES) $(LMR_CMD_FILES) $(LMR_LUA_FILES) \
-	$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-	$(GEOM_FILES) $(GRID_FILES) \
-	$(GAS_FILES) $(CEQ_SRC_FILES) $(LIBCEQ) $(LIBLUA) $(GZIP_FILES) \
-	$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-	$(NM_FILES) $(NTYPES_FILES) $(UTIL_FILES) \
-	$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-	$(DYAML_FILES) $(TINYENDIAN_FILES)
-	sed -e 's/PUT_PARALLEL_FLAVOUR_HERE/shared/' \
-	    -e 's/PUT_NUMBER_TYPE_HERE/real/' \
-	$(LMR_CMD)/runsim.d > runsim_shared.d
+lmr-entry: main.d $(LMR_SRC_DEPS) $(LMR_LUA_DEPS)
+	$(shell ./build-info.sh)
+	$(DMD) $(FLAVOUR_FLAGS) $(DFLAGS) $(OF)$@ $^ $(DLINKFLAGS) -J=.
+	
+lmr-run: runsim.d $(LMR_SRC_DEPS) $(LMR_LUA_DEPS)
+	$(shell ./build-info.sh)
+	# We're including extra files from lmr/commands/* here, but the version flags keep us safe
 	$(DMD) $(FLAVOUR_FLAGS) $(DFLAGS) $(OF)$@ $(DVERSION)run_main \
-		$(DVERSION)newton_krylov \
-		runsim_shared.d \
-		lmrconfig_with_str_subst.d \
-		$(LMR_CORE_FILES) $(LMR_LUA_FILES) $(LMR_CMD)/command.d $(LMR_CMD)/cmdhelper.d \
-		$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-		$(GEOM_FILES) $(GRID_FILES) \
-		-i=$(GAS_PACKAGE) -I=$(GAS_DIR) $(CEQ_SRC_FILES) $(GZIP_FILES) \
-		$(UTIL_FILES) $(NM_FILES) $(NTYPES_FILES) \
-		$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-		$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-		$(LIBCEQ) $(LIBLUA) \
-		$(DYAML_FILES) $(TINYENDIAN_FILES) \
-		$(DLINKFLAGS)
+		$^ $(DLINKFLAGS) -J=.
 
-lmrZ-run: lmrconfig_with_str_subst.d $(LMR_CORE_FILES) $(LMR_CMD_FILES) $(LMR_LUA_FILES) \
-	$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-	$(GEOM_FILES) $(GRID_FILES) \
-	$(GAS_FILES) $(CEQ_SRC_FILES) $(LIBCEQ) $(LIBLUA) $(GZIP_FILES) \
-	$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-	$(NM_FILES) $(NTYPES_FILES) $(UTIL_FILES) \
-	$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-	$(DYAML_FILES) $(TINYENDIAN_FILES)
-	sed -e 's/PUT_PARALLEL_FLAVOUR_HERE/shared/' \
-	    -e 's/PUT_NUMBER_TYPE_HERE/complex/' \
-	$(LMR_CMD)/runsim.d > runsim_shared.d
+lmrZ-run: runsim.d $(LMR_SRC_DEPS) $(LMR_LUA_DEPS)
+	$(shell ./build-info.sh)
 	$(DMD) $(FLAVOUR_FLAGS) $(DFLAGS) $(OF)$@ $(DVERSION)run_main \
-		$(DVERSION)newton_krylov \
-		$(DVERSION)complex_numbers \
-		runsim_shared.d \
-		lmrconfig_with_str_subst.d \
-		$(LMR_CORE_FILES) $(LMR_LUA_FILES) $(LMR_CMD)/command.d $(LMR_CMD)/cmdhelper.d \
-		$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-		$(GEOM_FILES) $(GRID_FILES) \
-		-i=$(GAS_PACKAGE) -I=$(GAS_DIR) $(CEQ_SRC_FILES) $(GZIP_FILES) \
-		$(UTIL_FILES) $(NM_FILES) $(NTYPES_FILES) \
-		$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-		$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-		$(LIBCEQ) $(LIBLUA) \
-		$(DYAML_FILES) $(TINYENDIAN_FILES) \
-		$(DLINKFLAGS)
+		$(DVERSION)complex_numbers $^ $(DLINKFLAGS) -J=.
 
-lmr-mpi-run: lmrconfig_with_str_subst.d $(LMR_CORE_FILES) $(LMR_CMD_FILES) $(LMR_LUA_FILES) \
-	$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-	$(GEOM_FILES) $(GRID_FILES) \
-	$(GAS_FILES) $(CEQ_SRC_FILES) $(LIBCEQ) $(LIBLUA) $(GZIP_FILES) \
-	$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-	$(NM_FILES) $(NTYPES_FILES) $(UTIL_FILES) \
-	$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-	$(DYAML_FILES) $(TINYENDIAN_FILES)
+lmr-mpi-run: runsim.d $(LMR_SRC_DEPS) $(LMR_LUA_DEPS)
+	$(shell ./build-info.sh)
 	cd $(MPI_DIR); make
-	sed -e 's/PUT_PARALLEL_FLAVOUR_HERE/$(MPI_IMPLEMENTATION)/' \
-	    -e 's/PUT_NUMBER_TYPE_HERE/real/' \
-	$(LMR_CMD)/runsim.d > runsim_mpi.d
 	$(DMD) $(FLAVOUR_FLAGS) $(DFLAGS) $(OF)$@ $(DVERSION)run_main \
-		$(DVERSION)mpi_parallel \
-		$(MPI_LIB_DIRS_SEARCH) \
-		$(DVERSION)newton_krylov \
-		runsim_mpi.d \
-		lmrconfig_with_str_subst.d \
-		$(LMR_CORE_FILES) $(LMR_LUA_FILES) $(LMR_CMD)/command.d $(LMR_CMD)/cmdhelper.d \
-		$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-		$(GEOM_FILES) $(GRID_FILES) \
-		$(GAS_FILES) $(CEQ_SRC_FILES) $(GZIP_FILES) \
-		$(UTIL_FILES) $(NM_FILES) $(NTYPES_FILES) \
-		$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-		$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) $(MPI_FILES) \
-		$(LIBCEQ) $(LIBLUA) \
-		$(DYAML_FILES) $(TINYENDIAN_FILES) \
-		$(DLINKFLAGS) -L-lmpi
+		$(DVERSION)mpi_parallel $(MPI_LIB_DIRS_SEARCH) $(MPI_FILES) \
+		$^ $(DLINKFLAGS) -L-lmpi -J=.
 
-lmrZ-mpi-run: lmrconfig_with_str_subst.d $(LMR_CORE_FILES) $(LMR_CMD_FILES) $(LMR_LUA_FILES) \
-	$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-	$(GEOM_FILES) $(GRID_FILES) \
-	$(GAS_FILES) $(CEQ_SRC_FILES) $(LIBCEQ) $(LIBLUA) $(GZIP_FILES) \
-	$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-	$(NM_FILES) $(NTYPES_FILES) $(UTIL_FILES) \
-	$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-	$(DYAML_FILES) $(TINYENDIAN_FILES)
+lmrZ-mpi-run: runsim.d $(LMR_SRC_DEPS) $(LMR_LUA_DEPS)
+	$(shell ./build-info.sh)
 	cd $(MPI_DIR); make
-	sed -e 's/PUT_PARALLEL_FLAVOUR_HERE/$(MPI_IMPLEMENTATION)/' \
-	    -e 's/PUT_NUMBER_TYPE_HERE/complex/' \
-	$(LMR_CMD)/runsim.d > runsim_mpi.d
 	$(DMD) $(FLAVOUR_FLAGS) $(DFLAGS) $(OF)$@ $(DVERSION)run_main \
-		$(DVERSION)mpi_parallel \
-		$(MPI_LIB_DIRS_SEARCH) \
-		$(DVERSION)newton_krylov \
+		$(DVERSION)mpi_parallel $(MPI_LIB_DIRS_SEARCH) $(MPI_FILES) \
 		$(DVERSION)complex_numbers \
-		runsim_mpi.d \
-		lmrconfig_with_str_subst.d \
-		$(LMR_CORE_FILES) $(LMR_LUA_FILES) $(LMR_CMD)/command.d $(LMR_CMD)/cmdhelper.d \
-		$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-		$(GEOM_FILES) $(GRID_FILES) \
-		$(GAS_FILES) $(CEQ_SRC_FILES) $(GZIP_FILES) \
-		$(UTIL_FILES) $(NM_FILES) $(NTYPES_FILES) \
-		$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-		$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) $(MPI_FILES) \
-		$(LIBCEQ) $(LIBLUA) \
-		$(DYAML_FILES) $(TINYENDIAN_FILES) \
-		$(DLINKFLAGS) -L-lmpi
+		$^ $(DLINKFLAGS) -L-lmpi -J=.
 
-lmr-check-jacobian: lmrconfig_with_str_subst.d $(LMR_CORE_FILES) $(LMR_CMD_FILES) $(LMR_LUA_FILES) \
-	$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-	$(GEOM_FILES) $(GRID_FILES) \
-	$(GAS_FILES) $(CEQ_SRC_FILES) $(LIBCEQ) $(LIBLUA) $(GZIP_FILES) \
-	$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-	$(NM_FILES) $(NTYPES_FILES) $(UTIL_FILES) \
-	$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-	$(DYAML_FILES) $(TINYENDIAN_FILES)
-	$(DMD) $(FLAVOUR_FLAGS) $(DFLAGS) $(OF)$@ \
-		$(DVERSION)newton_krylov \
-		$(LMR_CMD)/checkjacobian.d \
-		lmrconfig_with_str_subst.d \
-		$(LMR_CORE_FILES) $(LMR_CMD_FILES) $(LMR_LUA_FILES) \
-		$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-		$(GEOM_FILES) $(GRID_FILES) \
-		$(GAS_FILES) $(CEQ_SRC_FILES) $(GZIP_FILES) \
-		$(UTIL_FILES) $(NM_FILES) $(NTYPES_FILES) \
-		$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-		$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-		$(LIBCEQ) $(LIBLUA) \
-		$(DYAML_FILES) $(TINYENDIAN_FILES) \
-		$(DLINKFLAGS)
+lmr-check-jacobian: checkjacobian.d $(LMR_SRC_DEPS) $(LMR_LUA_DEPS)
+	$(shell ./build-info.sh)
+	$(DMD) $(FLAVOUR_FLAGS) $(DFLAGS) $(OF)$@ $^ $(DLINKFLAGS) -J=.
 
-lmrZ-check-jacobian: lmrconfig_with_str_subst.d $(LMR_CORE_FILES) $(LMR_CMD_FILES) $(LMR_LUA_FILES) \
-	$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-	$(GEOM_FILES) $(GRID_FILES) \
-	$(GAS_FILES) $(CEQ_SRC_FILES) $(LIBCEQ) $(LIBLUA) $(GZIP_FILES) \
-	$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-	$(NM_FILES) $(NTYPES_FILES) $(UTIL_FILES) \
-	$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-	$(DYAML_FILES) $(TINYENDIAN_FILES)
+lmrZ-check-jacobian: checkjacobian.d $(LMR_SRC_DEPS) $(LMR_LUA_DEPS)
+	$(shell ./build-info.sh)
 	$(DMD) $(FLAVOUR_FLAGS) $(DFLAGS) $(OF)$@ \
-		$(DVERSION)newton_krylov \
 		$(DVERSION)complex_numbers \
-		$(LMR_CMD)/checkjacobian.d \
-		lmrconfig_with_str_subst.d \
-		$(LMR_CORE_FILES) $(LMR_CMD_FILES) $(LMR_LUA_FILES) \
-		$(LMR_BC_FILES) $(LMR_SOLID_FILES) $(LMR_EFIELD_FILES) \
-		$(GEOM_FILES) $(GRID_FILES) \
-		$(GAS_FILES) $(CEQ_SRC_FILES) $(GZIP_FILES) \
-		$(UTIL_FILES) $(NM_FILES) $(NTYPES_FILES) \
-		$(KINETICS_FILES) $(GAS_LUA_FILES) $(KINETICS_LUA_FILES) \
-		$(GASDYN_FILES) $(GASDYN_LUA_FILES) $(NM_LUA_FILES) \
-		$(LIBCEQ) $(LIBLUA) \
-		$(DYAML_FILES) $(TINYENDIAN_FILES) \
-		$(DLINKFLAGS)
+		$^ $(DLINKFLAGS) -J=.
 
 #### Python programs
 lmr-verify: $(PY_PROG_DIR)/lmr_verify.py
@@ -505,7 +381,7 @@ lmr-verify: $(PY_PROG_DIR)/lmr_verify.py
 
 #### Auxiliary programs but part of making an eilmer install useful
 prep-gas:
-	cd $(GAS_DIR); make BUILD_DIR=$(BUILD_DIR) DMD=$(DMD) PLATFORM=$(PLATFORM) build-prep-gas
+	cd $(GAS_DIR); make BUILD_DIR=$(BUILD_DIR) DMD=$(DMD) PLATFORM=$(PLATFORM) prep-gas
 
 ugrid_partition:
 	- mkdir -p $(BUILD_DIR)/bin
@@ -513,13 +389,13 @@ ugrid_partition:
 	cd $(GRID_DIR); cp ugrid_partition $(BUILD_DIR)/bin
 
 prep-chem:
-	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) build-prep-chem
+	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) prep-chem
 
 chemkin2eilmer:
-	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) build-chemkin2eilmer
+	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) chemkin2eilmer
 
 prep-kinetics:
-	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) build-prep-kinetics
+	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) prep-kinetics
 
 gdtk-module:
 	sed -e 's+PUT_REVISION_STRING_HERE+$(REVISION_STRING)+' \
