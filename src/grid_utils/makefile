@@ -3,6 +3,7 @@
 # We can specify the LDC2 compiler as DMD=ldmd2 on the command-line
 # when invoking this makefile.  Can also ask for gdc.
 DMD ?= ldc2
+VPATH = grid_utils
 
 ifeq ($(shell uname -s), Darwin)
     PLATFORM := macosx
@@ -29,7 +30,7 @@ endif
 PROGRAMS := ugrid_partition
 
 ugrid_partition: ugrid_partition.d
-	$(DMD) $(DFLAGS) ugrid_partition.d $(DLINKFLAGS)
+	$(DMD) $(DFLAGS) $^ $(DLINKFLAGS)
 
 clean:
 	- rm -f *.o
@@ -39,5 +40,5 @@ clean:
 install: $(PROGRAMS)
 	- mkdir -p $(BUILD_DIR)/bin
 	cp $(PROGRAMS) $(BUILD_DIR)/bin/
-	cp -r $(BUILD_DIR)/bin/$(PROGRAMS) $(INSTALL_DIR)/bin
+	cp -r $(BUILD_DIR)/bin/* $(INSTALL_DIR)/bin
 
