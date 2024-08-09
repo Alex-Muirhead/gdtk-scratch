@@ -12,7 +12,7 @@ endif
 $(info PLATFORM=$(PLATFORM))
 
 NTYPES_DIR := ../ntypes
-NTYPES_FILES := $(NTYPES_DIR)/complex.d
+include $(NTYPES_DIR)/ntypes_files.mk
 
 UTIL_DIR := ../util
 include $(UTIL_DIR)/util_files.mk
