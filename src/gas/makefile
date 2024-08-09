@@ -147,9 +147,11 @@ DFLAGS += -dip1008 -preview=in
 # Here begins the list of targets, starting with the top-level actions.
 # ----------------------------------------------------------------------
 
+GAS_DIR := gas
+
 CIF_DIR := collision-integrals
-COLLISION_INTEGRAL_FILES := $(CIF_DIR)/gupta_etal_1990_CI_data.lua \
-	$(CIF_DIR)/wright_etal_CI_data.lua
+COLLISION_INTEGRAL_FILES := $(GAS_DIR)/species-database/$(CIF_DIR)/gupta_etal_1990_CI_data.lua \
+	$(GAS_DIR)/species-database/$(CIF_DIR)/wright_etal_CI_data.lua
 
 
 # Should we use suffixwith?
@@ -170,9 +172,9 @@ $(DATA_DIR):
 prep-gas: prep_gas.lua species-database.lua \
 		species-list.txt species_data_converter.lua $(COLLISION_INTEGRAL_FILES) \
 		| $(BIN_DIR) $(DATA_DIR)
-	cp prep_gas.lua $(BIN_DIR)/prep-gas; chmod +x $(BIN_DIR)/prep-gas
-	cp species_data_converter.lua $(BIN_DIR)/species-data-converter; chmod +x $(BIN_DIR)/species-data-converter
-	cp species-database.lua species-list.txt $(DATA_DIR)/
+	cp $(GAS_DIR)/prep_gas.lua $(BIN_DIR)/prep-gas; chmod +x $(BIN_DIR)/prep-gas
+	cp $(GAS_DIR)/species_data_converter.lua $(BIN_DIR)/species-data-converter; chmod +x $(BIN_DIR)/species-data-converter
+	cp $(GAS_DIR)/species-database/species-database.lua $(GAS_DIR)/species-database/species-list.txt $(DATA_DIR)/
 	cp $(COLLISION_INTEGRAL_FILES) $(DATA_DIR)/
 
 # The following are not required by the Eilmer flow solver but

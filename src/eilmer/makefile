@@ -297,12 +297,12 @@ include $(GEOM_DIR)/geom_files.mk
 GASDYN_DIR := ../gasdyn
 include $(GASDYN_DIR)/gasdyn_files.mk
 
-CEQ_DIR := ../extern/ceq/source
+CEQ_DIR := ../extern/ceq
 LIBCEQ := $(CEQ_DIR)/libceq.a
 include $(CEQ_DIR)/ceq_files.mk
 
 NTYPES_DIR := ../ntypes
-NTYPES_FILES := $(NTYPES_DIR)/complex.d
+include $(NTYPES_DIR)/ntypes_files.mk
 
 GZIP_DIR := ../extern/gzip
 GZIP_FILES := $(GZIP_DIR)/gzip.d
@@ -608,19 +608,19 @@ clean:
 	- cd $(CEQ_DIR); make clean
 
 prep-gas:
-	cd $(GAS_DIR); make BUILD_DIR=$(BUILD_DIR) DMD=$(DMD) PLATFORM=$(PLATFORM) build-prep-gas
+	cd $(GAS_DIR); make BUILD_DIR=$(BUILD_DIR) DMD=$(DMD) PLATFORM=$(PLATFORM) prep-gas
 
 ugrid_partition:
 	cd $(GRID_DIR); make BUILD_DIR=$(BUILD_DIR) DMD=$(DMD) PLATFORM=$(PLATFORM) ugrid_partition
 
 prep-chem:
-	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) build-prep-chem
+	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) prep-chem
 
 chemkin2eilmer:
-	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) build-chemkin2eilmer
+	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) chemkin2eilmer
 
 prep-kinetics:
-	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) build-prep-kinetics
+	cd $(KINETICS_DIR); make BUILD_DIR=$(BUILD_DIR) PLATFORM=$(PLATFORM) prep-kinetics
 
 $(LIBGASF):
 	cd $(GAS_DIR); make BUILD_DIR=$(BUILD_DIR) DMD=$(DMD) PLATFORM=$(PLATFORM) libgasf.a
