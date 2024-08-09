@@ -16,7 +16,6 @@
     "gdtk:gas"       : { "path": ".." },
     "gdtk:gasdyn"    : { "path": ".." },  
     "gdtk:geom"      : { "path": ".." },
-    "gdtk:grid_utils": { "path": ".." },
     "gdtk:nm"        : { "path": ".." },
     "gdtk:ntypes"    : { "path": ".." },
   },
