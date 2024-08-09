@@ -8,8 +8,6 @@ dummy:
 	echo "do nothing"
 
 clean:
-	- rm -f dub.json
-	- rm -rf .dub/
 	- rm -f mpi_configure mpi_splice
 	- rm -f source/mpi/package.d
 

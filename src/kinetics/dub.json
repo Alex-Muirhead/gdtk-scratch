@@ -1,0 +1,20 @@
+{
+	"authors": [
+		"GDTK Dev Group"
+	],
+	"copyright": "Copyright © 2023, GDTK Dev Group",
+	"description": "Gas Kinetics Library",
+	"license": "GPL-3.0",
+	"name": "kinetics",
+	"targetType": "sourceLibrary",
+	"sourcePaths": ["."],
+	"importPaths": ["."],
+	"dflags": ["-dip1008", "-preview=in"],
+	"excludedSourceFiles": ["kinetics/notes/*", "kinetics/retired/*"],
+	"dependencies": {
+		"ceq": { "path": "../extern/ceq" },
+		"gdtk:ntypes": { "path": ".." },
+		"gdtk:nm"    : { "path": ".." },
+		"gdtk:util"  : { "path": ".." }
+	}, 
+}

@@ -1,0 +1,27 @@
+{
+  "name": "gdtk",
+	"license": "GPL-3.0",
+  "subPackages": [
+    "./gas",
+    "./gasdyn",
+    "./geom",
+    "./grid_utils",
+    "./kinetics",
+    "./lmr",
+    "./nm",
+    "./ntypes",
+    "./util",
+  ],
+  "sourcePaths": ["."],
+  "dependencies": {
+    "gdtk:gas": "*",
+    "gdtk:gasdyn": "*",
+    "gdtk:geom": "*",
+    "gdtk:grid_utils": "*",
+    "gdtk:kinetics": "*",
+    "gdtk:lmr": "*",
+    "gdtk:nm": "*",
+    "gdtk:ntypes": "*",
+    "gdtk:util": "*",
+  }
+}

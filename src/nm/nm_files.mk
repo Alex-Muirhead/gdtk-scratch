@@ -1,27 +1,27 @@
-NM_DIR ?= .
-NM_FILES := $(NM_DIR)/package.d \
-	$(NM_DIR)/nm_exception.d \
-	$(NM_DIR)/number.d \
-	$(NM_DIR)/bbla.d \
-	$(NM_DIR)/bdfLU.d \
-	$(NM_DIR)/bracketing.d \
-	$(NM_DIR)/brent.d \
-	$(NM_DIR)/secant.d \
-	$(NM_DIR)/gaussquad.d \
-	$(NM_DIR)/linesearch.d \
-	$(NM_DIR)/nelmin.d \
-	$(NM_DIR)/newton.d \
-	$(NM_DIR)/newtoncotes.d \
-	$(NM_DIR)/ridder.d \
-	$(NM_DIR)/rungekutta.d \
-	$(NM_DIR)/rsla.d \
-	$(NM_DIR)/schedule.d \
-	$(NM_DIR)/smla.d \
-	$(NM_DIR)/stmatrix.d \
-	$(NM_DIR)/tree_patch.d \
-	$(NM_DIR)/univariate_lut.d \
-	$(NM_DIR)/limiters.d \
-	$(NM_DIR)/spline.d \
-	$(NM_DIR)/splinelsq.d
+SRC_DIR := $(NM_DIR)/nm
+NM_FILES := $(SRC_DIR)/package.d \
+	$(SRC_DIR)/nm_exception.d \
+	$(SRC_DIR)/number.d \
+	$(SRC_DIR)/bbla.d \
+	$(SRC_DIR)/bdfLU.d \
+	$(SRC_DIR)/bracketing.d \
+	$(SRC_DIR)/brent.d \
+	$(SRC_DIR)/secant.d \
+	$(SRC_DIR)/gaussquad.d \
+	$(SRC_DIR)/linesearch.d \
+	$(SRC_DIR)/nelmin.d \
+	$(SRC_DIR)/newton.d \
+	$(SRC_DIR)/newtoncotes.d \
+	$(SRC_DIR)/ridder.d \
+	$(SRC_DIR)/rungekutta.d \
+	$(SRC_DIR)/rsla.d \
+	$(SRC_DIR)/schedule.d \
+	$(SRC_DIR)/smla.d \
+	$(SRC_DIR)/stmatrix.d \
+	$(SRC_DIR)/tree_patch.d \
+	$(SRC_DIR)/univariate_lut.d \
+	$(SRC_DIR)/limiters.d \
+	$(SRC_DIR)/spline.d \
+	$(SRC_DIR)/splinelsq.d
 
-NM_LUA_FILES := $(NM_DIR)/luabbla.d
+NM_LUA_FILES := $(SRC_DIR)/luabbla.d

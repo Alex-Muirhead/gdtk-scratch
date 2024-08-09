@@ -1,0 +1,29 @@
+{
+	"authors": [
+		"GDTK Dev Group"
+	],
+	"copyright": "Copyright © 2023, GDTK Dev Group",
+	"description": "Grid Geometry Library",
+	"license": "GPL-3.0",
+	"name": "geom",
+	"sourcePaths": ["."],
+	"importPaths": ["."],
+	"excludedSourceFiles": ["geom/*demo.d"], 
+	"dflags": ["-dip1008", "-preview=in"],
+	"dependencies": {
+		"gzip": { "path": "../extern/gzip" },
+		"gdtk:util": { "path": ".." },
+		"gdtk:nm"  : { "path": ".." }
+	}, 
+	"configurations": [
+		{
+			"name": "library",
+			"excludedSourceFiles": [
+				"geom/misc/drifting_eye.d", 
+				"geom/misc/rotating_a.d",
+				"geom/misc/libplot.d", 
+				"geom/foamMesh.d"
+			]
+		}
+	]
+}

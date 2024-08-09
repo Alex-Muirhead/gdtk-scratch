@@ -1,8 +1,8 @@
-GASDYN_DIR ?= .
-GASDYN_FILES := $(GASDYN_DIR)/gasflowexception.d \
-	$(GASDYN_DIR)/idealgasflow.d \
-	$(GASDYN_DIR)/gasflow.d
+SRC_DIR := $(GASDYN_DIR)/gasdyn
+GASDYN_FILES := $(SRC_DIR)/gasflowexception.d \
+	$(SRC_DIR)/idealgasflow.d \
+	$(SRC_DIR)/gasflow.d
 
-GASDYN_LUA_FILES := $(GASDYN_DIR)/luaidealgasflow.d \
-	$(GASDYN_DIR)/luagasflow.d
+GASDYN_LUA_FILES := $(SRC_DIR)/luaidealgasflow.d \
+	$(SRC_DIR)/luagasflow.d
 

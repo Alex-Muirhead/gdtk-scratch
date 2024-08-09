@@ -1,7 +1,7 @@
-UTIL_DIR ?= .
-UTIL_FILES := $(UTIL_DIR)/lua.d \
-	$(UTIL_DIR)/json_helper.d \
-	$(UTIL_DIR)/lua_service.d \
-	$(UTIL_DIR)/msg_service.d \
-	$(UTIL_DIR)/time_utils.d \
-	$(UTIL_DIR)/zip.d
+SRC_DIR := $(UTIL_DIR)/util
+UTIL_FILES := $(SRC_DIR)/lua.d \
+	$(SRC_DIR)/json_helper.d \
+	$(SRC_DIR)/lua_service.d \
+	$(SRC_DIR)/msg_service.d \
+	$(SRC_DIR)/time_utils.d \
+	$(SRC_DIR)/zip.d

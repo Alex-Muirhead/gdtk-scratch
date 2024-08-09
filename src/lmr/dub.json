@@ -1,0 +1,67 @@
+{
+  "authors": [
+    "GDTK Dev Group"
+  ],
+  "copyright": "Copyright © 2023, GDTK Dev Group",
+  "description": "Eilmer 5 Application",
+  "homepage": "gdtk.uqcloud.net",
+  "license": "GPL-3.0",
+  "name": "lmr",
+  "sourcePaths": ["."],
+  "importPaths": ["."],
+  "stringImportPaths": ["."],
+  "dependencies": {
+    "dyaml"     : { "path": "../extern/D-YAML" },
+    "gzip"      : { "path": "../extern/gzip" },
+    "gdtk:gas"       : { "path": ".." },
+    "gdtk:gasdyn"    : { "path": ".." },  
+    "gdtk:geom"      : { "path": ".." },
+    "gdtk:nm"        : { "path": ".." },
+    "gdtk:ntypes"    : { "path": ".." },
+  },
+  "versions": [
+    "MHD",
+    "multi_T_gas",
+    "multi_species_gas", 
+    "newton_krylov", 
+    "turbulence" 
+  ],
+  "preGenerateCommands": ["cd $DUB_PACKAGE_DIR && ./build-info.sh"],
+  "postGenerateCommands": ["cd $DUB_PACKAGE_DIR && rm build-info.json"],
+  "configurations": [
+    {
+      "name": "executable",
+      "targetType": "executable",
+      "targetPath": "../../build/bin",
+      "mainSourceFile": "lmr/main.d",
+      "sourceFiles": ["lmr/commands/runsim.d"],
+      "excludedSourceFiles": ["lmr/commands/checkjacobian.d"],
+    },
+    {
+      "name": "shared-runner",
+      "targetType": "executable",
+      "targetPath": "../../build/bin",
+      "targetName": "lmr-run",
+      "mainSourceFile": "lmr/commands/runsim.d",
+      "versions": ["run_main"],
+      "excludedSourceFiles": ["lmr/commands/checkjacobian.d"],
+    },
+    {
+      "name": "mpi-runner",
+      "targetType": "executable",
+      "targetPath": "../../build/bin",
+      "targetName": "lmr-mpi-run",
+      "mainSourceFile": "lmr/commands/runsim.d",
+      "versions": ["run_main", "mpi_parallel"],
+      "excludedSourceFiles": ["lmr/commands/checkjacobian.d"],
+      "dependencies": {
+        "mpi": { "path": "../extern/OpenMPI" }
+      },
+    },
+    {
+      "name": "library",
+      "targetType": "sourceLibrary",
+      "excludedSourceFiles": ["lmr/main.d", "lmr/commands/checkjacobian.d"],
+    }
+  ],
+}
