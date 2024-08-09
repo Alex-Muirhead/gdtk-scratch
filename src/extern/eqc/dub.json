@@ -8,5 +8,5 @@
 	"name": "ceq",
 	"targetName": "ceq",
 	"sourceFiles": ["source/*.o"],
-	"preGenerateCommands": ["cd source && make -s objects"],
+	"preGenerateCommands": ["make -s objects"],
 }
