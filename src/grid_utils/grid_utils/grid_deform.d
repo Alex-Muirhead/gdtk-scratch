@@ -8,7 +8,9 @@
 module grid_deform;
 
 import std.stdio;
-import lmr.fluidblock;
+// FIXME: This now becomes dependent on Eilmer 4 or lmr 5, as fluidblock is specific
+//        For lmr 5, this requires lmr.fluidblock
+import fluidblock;
 import std.math;
 import std.algorithm;
 import ntypes.complex;

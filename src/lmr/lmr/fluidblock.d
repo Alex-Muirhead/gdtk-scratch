@@ -38,7 +38,6 @@ import lmr.conservedquantities;
 import lua_helper;
 import util.json_helper;
 import lmr.grid_motion;
-import grid_deform;
 import lmr.sfluidblock; // needed for some special-case processing, below
 import lmr.shockdetectors;
 import lmr.block;
