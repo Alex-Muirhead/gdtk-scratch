@@ -7,6 +7,6 @@
 	"license": "GPL-3.0",
 	"name": "ceq",
 	"targetName": "ceq",
-	"sourceFiles": ["source/*.o"],
+	"sourceFiles": ["*.o"],
 	"preGenerateCommands": ["make -s objects"],
 }
