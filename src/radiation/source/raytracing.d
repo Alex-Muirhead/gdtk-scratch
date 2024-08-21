@@ -19,7 +19,6 @@ import lmr.fvinterface : FVInterface;
 import lmr.sfluidblock : SFluidBlock;
 import lmr.ufluidblock : UFluidBlock;
 
-
 Grid get_grid(FluidBlock block) {
     final switch (block.grid_type) {
     case Grid_t.structured_grid:
@@ -30,7 +29,6 @@ Grid get_grid(FluidBlock block) {
         return ublk.grid;
     }
 }
-
 
 void trace_rays(FluidBlock block, number absorptivity) {
     auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
@@ -90,7 +88,6 @@ void trace_rays(FluidBlock block, number absorptivity) {
         break outer;
     }
 }
-
 
 FVInterface marching_efficient(
     size_t cellID, FluidBlock block, Vector3 rayTangent,
