@@ -17,7 +17,7 @@
 		},
 		{
 			"name": "unittest",
-			"dependencies": { "silly": "~>1.1.1" },
+			"dependencies": { "silly": "~>1.2.0-dev.2" },
 			"versions": [ "complex_numbers" ]
 		}
 	]
