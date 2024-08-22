@@ -3,11 +3,9 @@
     "Alex Muirhead"
   ],
   "copyright": "Copyright © 2024, Alex Muirhead",
-  "description": "Radiation Transport Sovler",
+  "description": "Radiation Transport Solver",
   "license": "GPL-3.0",
   "name": "radiation",
-  "targetName": "radiation",
-  "mainSourceFile": "source/app.d",
   "dependencies": {
     "gdtk:lmr": { "path": ".." },
     "gdtk:geom": { "path": ".." },
@@ -18,8 +16,21 @@
   },
   "configurations": [
     {
+      "name": "executable",
+      "targetType": "executable",
+      "targetName": "lmr-radiation",
+      "targetPath": "$INSTALL_DIR/bin",
+      "mainSourceFile": "source/app.d",
+    },
+    {
       "name": "unittest",
       "dependencies": { "silly": "~>1.2.0-dev.2" },
-    }
+    }, 
+    {
+      "name": "simple-grid",
+      "targetType": "executable",
+      "targetName": "simple-grid",
+      "mainSourceFile": "source/simple-grid.d",
+    },
   ]
 }
