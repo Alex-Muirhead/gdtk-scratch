@@ -6,8 +6,8 @@ import std.stdio;
 import std.getopt;
 
 import geom.elements.nomenclature : Face, opposite_face;
-import gas.physical_constants : StefanBoltzmann_constant;
 import geom.elements.vector3 : Vector3, distance_between;
+import gas.physical_constants : StefanBoltzmann_constant;
 import nm.number;
 
 import lmr.config;
