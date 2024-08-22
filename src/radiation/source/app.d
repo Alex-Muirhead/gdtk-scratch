@@ -99,7 +99,7 @@ void main(string[] args) {
             cellIntensity ~= block.cells[crossed[i]].grey_blackbody_intensity();
         }
 
-        number[] cellHeating = tangent_slab_heating(cellIntensity, opticalThickness, lengths);
+        number[] cellHeating = tangent_slab_heating(cellIntensity, opticalThickness);
 
         foreach (i, cellID; crossed) {
             block.cells[cellID].fs.Qrad = cellHeating[i];
