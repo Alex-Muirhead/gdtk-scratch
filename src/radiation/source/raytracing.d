@@ -30,23 +30,19 @@ Grid get_grid(FluidBlock block) {
     }
 }
 
-void trace_rays(FluidBlock block, number absorptivity) {
+void trace_rays(FluidBlock block, number absorptionCoefficient) {
     auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
     uint angleSamples = 100;
 
-    // FIXME: This needs to scan over for the minimum temperature
-    number baseEmission = StefanBoltzmann_constant * 280 ^^ 4;
+    foreach (cell_id, ref origin; block.cells) {
 
-    outer: foreach (cell_id, ref origin; block.cells) {
-
-        // auto angle = uniform(0.0f, 2*PI, rng);
-        number fullEmission = origin.volume[0] * StefanBoltzmann_constant * origin.fs.gas.T ^^ 4;
-        fullEmission -= baseEmission; // Add back baseline background radiation
+        number fullEmission = 4*PI * origin.volume[0] * origin.grey_blackbody_intensity();
         origin.fs.Qrad -= fullEmission; // Remove the energy of the ray emitted
 
         foreach (a; 0 .. angleSamples) {
             // Loop through angles for now
-            auto angle = 2 * PI * a / angleSamples;
+            auto angle = uniform(0.0f, 2*PI, rng);
+            // auto angle = 2 * PI * a / angleSamples;
             auto direction = Vector3([cos(angle), sin(angle), 0]);
             direction.normalize(); // Shouldn't be needed with random angle
 
@@ -55,12 +51,14 @@ void trace_rays(FluidBlock block, number absorptivity) {
             size_t[] rayCells;
             number[] rayLengths;
             // FVInterface inter = marching_full(cell_id, firstBlock, direction, rayCells, rayLengths);
+            writeln("Starting to trace ray from cell ", cell_id, " in direction ", direction);
             FVInterface inter = marching_efficient(cell_id, block, direction, rayCells, rayLengths);
+            writeln("Ray traced with ", rayLengths.length, " cells");
 
             // Try and handle ghost cells
             BoundaryCondition boundary = block.bc[inter.bc_id];
             if (boundary.preReconAction.length > 0) {
-                writeln("Boundary type: ", boundary.type);
+                // writeln("Boundary type: ", boundary.type);
                 auto mygce = cast(GhostCellFullFaceCopy) boundary.preReconAction[0];
                 if (mygce) {
                     // We have a full face copy, does this only exist for structured?
@@ -79,13 +77,18 @@ void trace_rays(FluidBlock block, number absorptivity) {
             }
 
             number heating;
-            foreach (i; 0 .. rayCells.length) {
-                heating = rayStrength * (1 - (1 - absorptivity) ^^ rayLengths[i]);
-                rayStrength -= heating;
+            number opticalThickness;
+
+            inner: foreach (i; 0 .. rayCells.length) {
+                // Kill off the ray if it's too weak
+                if (rayStrength < 1E-5) { break inner; }
+
+                opticalThickness = absorptionCoefficient * rayLengths[i];
+                heating = rayStrength * (1 - exp(-opticalThickness));
+                rayStrength *= exp(-opticalThickness);
                 block.cells[rayCells[i]].fs.Qrad += heating;
             }
         }
-        break outer;
     }
 }
 
@@ -148,7 +151,7 @@ FVInterface marching_efficient(
                 number t = wedge2D(toVertex, rayTangent) / alignment;
 
                 // There should only be a single solution if the cell is convex
-                if (t >= 0 && t < 1 && s > number.epsilon) {
+                if (t >= 0 && t < 1 && s > 1E5 * number.epsilon) {
                     iface_id = n;
                     step_length = s;
                     break faces;
@@ -165,6 +168,8 @@ FVInterface marching_efficient(
             //       with no ghost cell on the other side
             currentCell = (currentCell.outsign[iface_id] == +1)
                 ? outgoing.right_cell : outgoing.left_cell;
+            // writeln("Stepping ", step_length, " in direction ", rayTangent);
+            // writeln("Stepping across ", outgoing," to cell ", currentCell);
 
             if (outgoing.is_on_boundary) {
                 isWithinBlock = false;
