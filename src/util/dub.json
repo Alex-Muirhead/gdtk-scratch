@@ -26,6 +26,10 @@
 	],
 	"configurations": [
 		{
+			"name": "library",
+			"targetType": "library"
+		},
+		{
 			"name": "unittest",
 			"dependencies": { "silly": "~>1.2.0-dev.2" }
 		},
