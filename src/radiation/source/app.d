@@ -38,7 +38,7 @@ void main(string[] args) {
     writeln("Initial workings on a standalone radiation post-processing code.");
 
     // Hard-code how many snapshots we're working with
-    uint snapshotStart = 0004;
+    uint snapshotStart = 0000;
     uint nWrittenSnapshots = snapshotStart + 1;
 
     alias cfg = GlobalConfig;
@@ -75,36 +75,38 @@ void main(string[] args) {
     double absorptionCoefficient = 5.0;
     FluidBlock block = localFluidBlocks[0];
 
-    uint wallSide = Face.west;
+    uint wallSide = Face.east;
     uint direction = opposite_face(wallSide);
     BoundaryCondition capsuleWall = block.bc[wallSide];
 
-    foreach (n, iface; capsuleWall.faces) {
+    // foreach (n, iface; capsuleWall.faces) {
 
-        // Start tangent trace routine
+    //     // Start tangent trace routine
 
-        size_t[] crossed = [];
-        number[] lengths = [];
+    //     size_t[] crossed = [];
+    //     number[] lengths = [];
 
-        // naive_tangent_marching(iface.left_cell.id, block, direction, crossed, lengths);
-        // NOTE: Need to switch interface SIDE and normal SIGN when going from West to East etc.
-        marching_efficient(iface.right_cell.id, block, iface.n, crossed, lengths);
+    //     naive_tangent_marching(iface.left_cell.id, block, direction, crossed, lengths);
+    //     // NOTE: Need to switch interface SIDE and normal SIGN when going from West to East etc.
+    //     // marching_efficient(iface.right_cell.id, block, iface.n, crossed, lengths);
 
-        number[] cellIntensity = [];
-        number[] opticalThickness = [];
+    //     number[] cellIntensity = [];
+    //     number[] opticalThickness = [];
 
-        for (auto i = 0; i < crossed.length; i++) {
-            // NOTE: Absorption coefficient might be temperature dependent
-            opticalThickness ~= absorptionCoefficient * lengths[i];
-            cellIntensity ~= block.cells[crossed[i]].grey_blackbody_intensity();
-        }
+    //     for (auto i = 0; i < crossed.length; i++) {
+    //         // NOTE: Absorption coefficient might be temperature dependent
+    //         opticalThickness ~= absorptionCoefficient * lengths[i];
+    //         cellIntensity ~= block.cells[crossed[i]].grey_blackbody_intensity();
+    //     }
 
-        number[] cellHeating = tangent_slab_heating(cellIntensity, opticalThickness);
+    //     number[] cellHeating = tangent_slab_heating(cellIntensity, opticalThickness);
 
-        foreach (i, cellID; crossed) {
-            block.cells[cellID].fs.Qrad = cellHeating[i];
-        }
-    }
+    //     foreach (i, cellID; crossed) {
+    //         block.cells[cellID].fs.Qrad = cellHeating[i];
+    //     }
+    // }
+
+    trace_rays(block, absorptionCoefficient);
 
     foreach (blk; localFluidBlocks) {
         auto fileName = fluidFilename(nWrittenSnapshots, blk.id);

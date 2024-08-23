@@ -36,8 +36,7 @@ number[] tangent_slab_heating(
         opticalDistance = halfThickness;
         for (auto j = long(i) - 1; j >= 0; --j) {
             heatFlux += intensity[j] * (
-                exponential_integral(
-                    opticalDistance) -
+                exponential_integral(opticalDistance) -
                     exponential_integral(opticalDistance + opticalThickness[j])
             );
             opticalDistance += opticalThickness[j];
@@ -46,8 +45,7 @@ number[] tangent_slab_heating(
         opticalDistance = halfThickness;
         for (auto j = i + 1; j < numCells; ++j) {
             heatFlux += intensity[j] * (
-                exponential_integral(
-                    opticalDistance) -
+                exponential_integral(opticalDistance) -
                     exponential_integral(opticalDistance + opticalThickness[j])
             );
             opticalDistance += opticalThickness[j];
