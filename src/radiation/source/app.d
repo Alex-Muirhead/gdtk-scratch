@@ -72,7 +72,7 @@ void main(string[] args) {
     string dirName = snapshotDirectory(nWrittenSnapshots);
     ensure_directory_is_present(dirName);
 
-    double absorptionCoefficient = 5.0;
+    double absorptionCoefficient = 1.0;
     FluidBlock block = localFluidBlocks[0];
 
     uint wallSide = Face.east;
@@ -102,7 +102,7 @@ void main(string[] args) {
     //     number[] cellHeating = tangent_slab_heating(cellIntensity, opticalThickness);
 
     //     foreach (i, cellID; crossed) {
-    //         block.cells[cellID].fs.Qrad = cellHeating[i];
+    //         block.cells[cellID].fs.Qrad = cellHeating[i] * block.cells[cellID].volume[0];
     //     }
     // }
 
