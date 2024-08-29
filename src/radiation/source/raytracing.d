@@ -32,17 +32,18 @@ Grid get_grid(FluidBlock block) {
 
 void trace_rays(FluidBlock block, number absorptionCoefficient) {
     auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
-    uint angleSamples = 100;
+    uint angleSamples = 967;
+    // NOTE: Using angleSamples of 1000 causes NaN values. Weird??
 
     foreach (cell_id, ref origin; block.cells) {
 
         number fullEmission = 4*PI * origin.volume[0] * origin.grey_blackbody_intensity();
-        origin.fs.Qrad -= fullEmission; // Remove the energy of the ray emitted
+        // origin.fs.Qrad -= fullEmission; // Remove the energy of the ray emitted
 
         foreach (a; 0 .. angleSamples) {
             // Loop through angles for now
-            auto angle = uniform(0.0f, 2*PI, rng);
-            // auto angle = 2 * PI * a / angleSamples;
+            // auto angle = uniform(0.0f, 2*PI, rng);
+            auto angle = 2 * PI * a / angleSamples;
             auto direction = Vector3([cos(angle), sin(angle), 0]);
             direction.normalize(); // Shouldn't be needed with random angle
 
@@ -51,9 +52,9 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
             size_t[] rayCells;
             number[] rayLengths;
             // FVInterface inter = marching_full(cell_id, firstBlock, direction, rayCells, rayLengths);
-            writeln("Starting to trace ray from cell ", cell_id, " in direction ", direction);
+            // writeln("Starting to trace ray from cell ", cell_id, " in direction ", direction);
             FVInterface inter = marching_efficient(cell_id, block, direction, rayCells, rayLengths);
-            writeln("Ray traced with ", rayLengths.length, " cells");
+            // writeln("Ray traced with ", rayLengths.length, " cells");
 
             // Try and handle ghost cells
             BoundaryCondition boundary = block.bc[inter.bc_id];
@@ -72,7 +73,7 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
                     //       and consequently the mapped cell.
                     size_t boundaryCellID = inter.i_bndry * block.n_ghost_cell_layers;
                     FluidFVCell mappedCell = mygce.mapped_cells[boundaryCellID];
-                    writeln("Cell ", rayCells[$ - 1], " maps to ", mappedCell.id);
+                    // writeln("Cell ", rayCells[$ - 1], " maps to ", mappedCell.id);
                 }
             }
 
@@ -81,7 +82,10 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
 
             inner: foreach (i; 0 .. rayCells.length) {
                 // Kill off the ray if it's too weak
-                if (rayStrength < 1E-5) { break inner; }
+                if (rayStrength < 1E-10) { 
+                    block.cells[rayCells[i]].fs.Qrad += rayStrength;
+                    break inner; 
+                }
 
                 opticalThickness = absorptionCoefficient * rayLengths[i];
                 heating = rayStrength * (1 - exp(-opticalThickness));
