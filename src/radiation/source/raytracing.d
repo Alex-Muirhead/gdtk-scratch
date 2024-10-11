@@ -24,6 +24,9 @@ import lmr.ufluidblock : UFluidBlock;
 
 // External packages
 import progress.bar;
+import mir.random.engine;
+import mir.random.ndvariable : sphereVar;
+
 Grid get_grid(FluidBlock block) {
     final switch (block.grid_type) {
     case Grid_t.structured_grid:
@@ -55,11 +58,11 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
         // origin.fs.Qrad -= fullEmission; // Remove the energy of the ray emitted
 
         foreach (a; 0 .. angleSamples) {
-            // Loop through angles for now
-            // auto angle = uniform(0.0f, 2*PI, rng);
-            auto angle = 2 * PI * a / angleSamples;
-            auto direction = Vector3([cos(angle), sin(angle), 0]);
-            direction.normalize(); // Shouldn't be needed with random angle
+            number[3] angleVector;
+            sphereVar()(rne, angleVector);  // TODO: Check if this is _true_ SO3
+
+            Vector3 direction = Vector3([angleVector[0], angleVector[1], 0]);
+            number mu = sqrt(1 - angleVector[2]^^2);
 
             number rayEnergy = fullEmissionEnergy / angleSamples;
 
@@ -69,21 +72,20 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
             number[] rayLengths;
             // FVInterface inter = marching_full(cell_id, firstBlock, direction, rayCells, rayLengths);
             FVInterface inter = marching_efficient(cell_id, block, direction, rayCells, rayLengths);
-            number heating;
-            number opticalThickness;
 
             inner: foreach (i; 0 .. rayCells.length) {
+                number cellVolume = block.cells[rayCells[i]].volume[0];
                 // Kill off the ray if it's too weak
-                if (rayStrength < 1E-10) { 
-                    block.cells[rayCells[i]].fs.Qrad += rayStrength;
+                if (rayEnergy < 1E-10) { 
+                    block.cells[rayCells[i]].fs.Qrad += rayEnergy / cellVolume;
                     break inner; 
                 }
 
-                opticalThickness = absorptionCoefficient * rayLengths[i];
-                heating = rayStrength * (1 - exp(-opticalThickness));
-                rayStrength *= exp(-opticalThickness);
-                block.cells[rayCells[i]].fs.Qrad += heating;
+                number opticalThickness = absorptionCoefficient * rayLengths[i] / mu;
+                number heating = rayEnergy * (1 - exp(-opticalThickness));
                 energyAbsorbed += heating;
+                rayEnergy *= exp(-opticalThickness);
+                block.cells[rayCells[i]].fs.Qrad += heating / cellVolume;
             }
             energyLost += rayEnergy;
 
