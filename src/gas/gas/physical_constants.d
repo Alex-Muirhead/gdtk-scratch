@@ -25,6 +25,6 @@ immutable double Plancks_constant = 6.62607015e-34;      // J/Hz
 immutable double speed_of_light = 299_792_458.0;         // m/s
 // Derived quantities
 immutable double StefanBoltzmann_constant = (            // W/m^2/K^4
-    PI^^5 * Boltzmann_constant^^4 
-    / (60 * Plancks_constant^^3 * speed_of_light^^2)
+    2 * PI^^5 * Boltzmann_constant^^4 
+    / (15 * Plancks_constant^^3 * speed_of_light^^2)
 );
