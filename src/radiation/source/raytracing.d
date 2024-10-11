@@ -9,7 +9,7 @@ import std.algorithm.mutation : swap;
 import std.random : Random, uniform;
 
 import gas.physical_constants : StefanBoltzmann_constant;
-import geom.elements.vector3 : Vector3, wedge2D;
+import geom.elements.vector3 : Vector3, wedge2D, dot;
 import geom.grid.grid : Grid, Grid_t;
 import nm.number : number;
 
@@ -40,6 +40,10 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
     uint angleSamples = 967;
     // NOTE: Using angleSamples of 1000 causes NaN values. Weird??
 
+    number energyLost = 0.0;
+    number energyEmitted = 0.0;
+    number energyAbsorbed = 0.0;
+
     Bar progressBar = new Bar();
     progressBar.message = { return "Ray-tracing progress"; };
     progressBar.suffix = { return format("%6.2f%%", progressBar.percent); };
@@ -47,7 +51,7 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
 
     foreach (cell_id, ref origin; block.cells) {
 
-        number fullEmission = 4*PI * origin.volume[0] * origin.grey_blackbody_intensity();
+        number fullEmissionEnergy = 4*PI * origin.volume[0] * absorptionCoefficient * origin.grey_blackbody_intensity();
         // origin.fs.Qrad -= fullEmission; // Remove the energy of the ray emitted
 
         foreach (a; 0 .. angleSamples) {
@@ -57,7 +61,9 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
             auto direction = Vector3([cos(angle), sin(angle), 0]);
             direction.normalize(); // Shouldn't be needed with random angle
 
-            auto rayStrength = fullEmission / angleSamples;
+            number rayEnergy = fullEmissionEnergy / angleSamples;
+
+            energyEmitted += rayEnergy;
 
             size_t[] rayCells;
             number[] rayLengths;
@@ -101,7 +107,9 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
                 heating = rayStrength * (1 - exp(-opticalThickness));
                 rayStrength *= exp(-opticalThickness);
                 block.cells[rayCells[i]].fs.Qrad += heating;
+                energyAbsorbed += heating;
             }
+            energyLost += rayEnergy;
 
             progressBar.next();
         }
