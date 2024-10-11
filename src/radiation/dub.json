@@ -39,6 +39,7 @@
 		"gdtk:lmr": {
 			"path": ".."
 		},
+		"mir-random": "~>2.2.19",
 		"progress": "~>5.0.2"
 	},
 	"description": "Radiation Transport Solver",
