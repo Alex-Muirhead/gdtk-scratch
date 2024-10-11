@@ -68,31 +68,7 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
             size_t[] rayCells;
             number[] rayLengths;
             // FVInterface inter = marching_full(cell_id, firstBlock, direction, rayCells, rayLengths);
-            // writeln("Starting to trace ray from cell ", cell_id, " in direction ", direction);
             FVInterface inter = marching_efficient(cell_id, block, direction, rayCells, rayLengths);
-            // writeln("Ray traced with ", rayLengths.length, " cells");
-
-            // Try and handle ghost cells
-            BoundaryCondition boundary = block.bc[inter.bc_id];
-            if (boundary.preReconAction.length > 0) {
-                // writeln("Boundary type: ", boundary.type);
-                auto mygce = cast(GhostCellFullFaceCopy) boundary.preReconAction[0];
-                if (mygce) {
-                    // We have a full face copy, does this only exist for structured?
-                    // I think we use `GhostCellMappedCopy` for unstructured...
-                    // QUESTION: Are there other effects that mean we walk across the boundary?
-
-                    // NOTE: We should always intersect the 0th (first) layer of the ghost cells
-                    //       in the boundary. Since ghost cells are added walking away from the
-                    //       boundary, this means we can multiply the `i_bndry` by the number
-                    //       of ghost cell layers to get the correct position of the ghost cells
-                    //       and consequently the mapped cell.
-                    size_t boundaryCellID = inter.i_bndry * block.n_ghost_cell_layers;
-                    FluidFVCell mappedCell = mygce.mapped_cells[boundaryCellID];
-                    // writeln("Cell ", rayCells[$ - 1], " maps to ", mappedCell.id);
-                }
-            }
-
             number heating;
             number opticalThickness;
 
@@ -292,4 +268,27 @@ FVInterface marching_full(
         }
     }
     return hit;
+}
+
+void check_interface(FluidBlock block, FVInterface inter) {
+    // Try and handle ghost cells
+    BoundaryCondition boundary = block.bc[inter.bc_id];
+    if (boundary.preReconAction.length > 0) {
+        // writeln("Boundary type: ", boundary.type);
+        auto mygce = cast(GhostCellFullFaceCopy) boundary.preReconAction[0];
+        if (mygce) {
+            // We have a full face copy, does this only exist for structured?
+            // I think we use `GhostCellMappedCopy` for unstructured...
+            // QUESTION: Are there other effects that mean we walk across the boundary?
+
+            // NOTE: We should always intersect the 0th (first) layer of the ghost cells
+            //       in the boundary. Since ghost cells are added walking away from the
+            //       boundary, this means we can multiply the `i_bndry` by the number
+            //       of ghost cell layers to get the correct position of the ghost cells
+            //       and consequently the mapped cell.
+            size_t boundaryCellID = inter.i_bndry * block.n_ghost_cell_layers;
+            FluidFVCell mappedCell = mygce.mapped_cells[boundaryCellID];
+            writeln("Interface ", inter.id, " maps to ", mappedCell.id);
+        }
+    }
 }
