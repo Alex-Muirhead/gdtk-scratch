@@ -25,7 +25,6 @@ import lmr.sfluidblock;
 import lmr.ufluidblock;
 
 import raytracing;
-import tangentslab;
 
 void main(string[] args) {
 
@@ -79,33 +78,6 @@ void main(string[] args) {
     uint direction = opposite_face(wallSide);
     BoundaryCondition capsuleWall = block.bc[wallSide];
 
-    // foreach (n, iface; capsuleWall.faces) {
-
-    //     // Start tangent trace routine
-
-    //     size_t[] crossed = [];
-    //     number[] lengths = [];
-
-    //     naive_tangent_marching(iface.left_cell.id, block, direction, crossed, lengths);
-    //     // NOTE: Need to switch interface SIDE and normal SIGN when going from West to East etc.
-    //     // marching_efficient(iface.right_cell.id, block, iface.n, crossed, lengths);
-
-    //     number[] cellIntensity = [];
-    //     number[] opticalThickness = [];
-
-    //     for (auto i = 0; i < crossed.length; i++) {
-    //         // NOTE: Absorption coefficient might be temperature dependent
-    //         opticalThickness ~= absorptionCoefficient * lengths[i];
-    //         cellIntensity ~= block.cells[crossed[i]].grey_blackbody_intensity();
-    //     }
-
-    //     number[] cellHeating = tangent_slab_heating(cellIntensity, opticalThickness);
-
-    //     foreach (i, cellID; crossed) {
-    //         block.cells[cellID].fs.Qrad = cellHeating[i] * block.cells[cellID].volume[0];
-    //     }
-    // }
-
     trace_rays(block, absorptionCoefficient);
 
     foreach (blk; localFluidBlocks) {
@@ -119,30 +91,4 @@ void main(string[] args) {
         }
         fluidBlkIO.writeVariablesToFile(fileName, cells);
     }
-}
-
-FVInterface naive_tangent_marching(
-    size_t cellID, FluidBlock block, uint rayDirection,
-    ref size_t[] crossed, ref number[] lengths
-) {
-    FluidFVCell currentCell = block.cells[cellID];
-    // Grid currentGrid = get_grid(block); // NOTE: Could use the grid for direction?
-
-    while (true) {
-        crossed ~= currentCell.id;
-        lengths ~= distance_between(
-            currentCell.iface[rayDirection].pos,
-            currentCell.iface[opposite_face(rayDirection)].pos);
-
-        // This appears to be the best way to check if we hit an edge
-        // But it will also trigger if we cross a block boundary
-        if (currentCell.iface[rayDirection].is_on_boundary) {
-            break;
-        }
-
-        // Cell cloud is offset by 1, as the cloud contains the cell itself
-        currentCell = currentCell.cell_cloud[rayDirection + 1];
-    }
-
-    return currentCell.iface[rayDirection];
 }
