@@ -1,36 +1,50 @@
 {
-  "authors": [
-    "Alex Muirhead"
-  ],
-  "copyright": "Copyright © 2024, Alex Muirhead",
-  "description": "Radiation Transport Solver",
-  "license": "GPL-3.0",
-  "name": "radiation",
-  "dependencies": {
-    "gdtk:lmr": { "path": ".." },
-    "gdtk:geom": { "path": ".." },
-  },
-  "toolchainRequirements": {
-    "ldc": "~>1.30",
-    "dmd": ">=2.107",
-  },
-  "configurations": [
-    {
-      "name": "executable",
-      "targetType": "executable",
-      "targetName": "lmr-radiation",
-      "targetPath": "$INSTALL_DIR/bin",
-      "mainSourceFile": "source/app.d",
-    },
-    {
-      "name": "unittest",
-      "dependencies": { "silly": "~>1.2.0-dev.2" },
-    }, 
-    {
-      "name": "simple-grid",
-      "targetType": "executable",
-      "targetName": "simple-grid",
-      "mainSourceFile": "source/simple-grid.d",
-    },
-  ]
+	"authors": [
+		"Alex Muirhead"
+	],
+	"configurations": [
+		{
+			"mainSourceFile": "source/raytracing_app.d",
+			"name": "raytrace",
+			"targetName": "lmr-raytrace",
+			"targetPath": "$INSTALL_DIR/bin",
+			"targetType": "executable"
+		},
+		{
+			"mainSourceFile": "source/tangentslab_app.d",
+			"name": "tangentslab",
+			"targetName": "lmr-tangentslab",
+			"targetPath": "$INSTALL_DIR/bin",
+			"targetType": "executable"
+		},
+		{
+			"dependencies": {
+				"silly": "~>1.2.0-dev.2"
+			},
+			"name": "unittest",
+			"targetType": "library"
+		},
+		{
+			"mainSourceFile": "source/simple-grid.d",
+			"name": "simple-grid",
+			"targetName": "simple-grid",
+			"targetType": "executable"
+		}
+	],
+	"copyright": "Copyright © 2024, Alex Muirhead",
+	"dependencies": {
+		"gdtk:geom": {
+			"path": ".."
+		},
+		"gdtk:lmr": {
+			"path": ".."
+		},
+	},
+	"description": "Radiation Transport Solver",
+	"license": "GPL-3.0",
+	"name": "radiation",
+	"toolchainRequirements": {
+		"dmd": ">=2.107.0",
+		"ldc": "~>1.30"
+	}
 }
