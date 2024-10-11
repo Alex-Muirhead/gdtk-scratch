@@ -3,3 +3,4 @@ cea2/
 
 src/radiation/fireII
 src/radiation/ideal-air.gas
+src/radiation/tests/simple-grid/lmrsim
