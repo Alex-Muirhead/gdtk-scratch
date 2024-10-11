@@ -39,6 +39,7 @@
 		"gdtk:lmr": {
 			"path": ".."
 		},
+		"progress": "~>5.0.2"
 	},
 	"description": "Radiation Transport Solver",
 	"license": "GPL-3.0",

@@ -1,6 +1,9 @@
 module raytracing;
 
+// Standard modules
+import std.conv : to;
 import std.stdio;
+import std.format;
 import std.math;
 import std.algorithm.mutation : swap;
 import std.random : Random, uniform;
@@ -19,6 +22,8 @@ import lmr.fvinterface : FVInterface;
 import lmr.sfluidblock : SFluidBlock;
 import lmr.ufluidblock : UFluidBlock;
 
+// External packages
+import progress.bar;
 Grid get_grid(FluidBlock block) {
     final switch (block.grid_type) {
     case Grid_t.structured_grid:
@@ -34,6 +39,11 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
     auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
     uint angleSamples = 967;
     // NOTE: Using angleSamples of 1000 causes NaN values. Weird??
+
+    Bar progressBar = new Bar();
+    progressBar.message = { return "Ray-tracing progress"; };
+    progressBar.suffix = { return format("%6.2f%%", progressBar.percent); };
+    progressBar.max = angleSamples * block.cells.length;
 
     foreach (cell_id, ref origin; block.cells) {
 
@@ -92,8 +102,17 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
                 rayStrength *= exp(-opticalThickness);
                 block.cells[rayCells[i]].fs.Qrad += heating;
             }
+
+            progressBar.next();
         }
     }
+
+    progressBar.finish();
+
+    writeln(format("Energy emitted: %.3g", energyEmitted));
+    writeln(format("Energy absorbed: %.3g", energyAbsorbed));
+    writeln(format("Energy lost: %.3g", energyLost));
+    writeln(format("Discrepency: %.3g", energyEmitted - energyLost - energyAbsorbed));
 }
 
 FVInterface marching_efficient(
