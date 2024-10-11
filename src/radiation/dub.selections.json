@@ -5,6 +5,9 @@
 		"dyaml": {"path":"../extern/D-YAML"},
 		"gdtk": {"path":".."},
 		"gzip": {"path":"../extern/gzip"},
+		"mpi": {"path":"../extern/OpenMPI"},
+		"progress": "5.0.2",
+		"silly": "1.2.0-dev.2",
 		"tinyendian": "0.2.0"
 	}
 }
