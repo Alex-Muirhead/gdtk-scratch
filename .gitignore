@@ -1,6 +1,4 @@
 # We may have the cea2 directory in extern/ but we do not distribute it with dgd.
 cea2/
 
-src/radiation/fireII
-src/radiation/ideal-air.gas
-src/radiation/tests/simple-grid/lmrsim
+src/lmr/build-info.json
