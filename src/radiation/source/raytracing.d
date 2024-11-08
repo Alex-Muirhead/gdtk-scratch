@@ -195,6 +195,224 @@ FVInterface marching_efficient(
     return outgoing;
 }
 
+
+class HyperbolicRay {
+public:
+    Vector3 center;
+    number radius;
+    number slope;
+    number arcCoord;
+private:
+    Vector3 positiveAsymptote;
+    Vector3 negativeAsymptote;
+    number correction;
+
+    this(Vector3 tangent, Vector3 point) {
+        arcCoord = (point.y * tangent.y + point.z * tangent.z)
+            / (tangent.y ^^ 2 + tangent.z ^^ 2);
+
+        Vector3 saddle = point - tangent * arcCoord;
+
+        center = Vector3(saddle.x, 0.0);
+        radius = sqrt(saddle.y ^^ 2 + saddle.z ^^ 2);
+        slope = tangent.x / sqrt(1 - tangent.x ^^ 2);
+
+
+        // Positive and Negative are defined relative to tangent vector.
+        // The arc-coordinate is defined in the same frame.
+        positiveAsymptote = Vector3(+slope, 1);
+        negativeAsymptote = Vector3(-slope, 1);
+
+        correction = sqrt(1 + slope^^2); // Magnitude of asymptote vectors
+    }
+
+    void walkForward(number arcLength) {
+        arcCoord += arcLength;
+    }
+
+    bool intersect(Vector3 vertexOne, Vector3 vertexTwo, out number arcLength) {
+        // Maybe we can use the normal here, and a dot product later?
+        // But then we might need the magnitude later...
+        // Plus, we need to use this to interpolate the intersection point!
+        Vector3 faceTangent = vertexTwo - vertexOne;
+        
+        // Which way does the interface-normal "point"
+        // Is a +'ve value an agreement?
+        // Note that a face can align with *both*
+        // 
+        // 1. If they have the same sign, the interface is _shallower_ than
+        //    the hyperboloid, and we need to check if its internal to the throat.
+        //    If its external to the throat, the infinite line is guaranteed to intersect.
+        // 
+        // 2. If they have different signs, the interface is _steeper_ than 
+        //    the hyperboloid, and the infinite line is guaranteed to intersect.
+
+        number positiveAlignment = wedge2D(positiveAsymptote, faceTangent);
+        number negativeAlignment = wedge2D(negativeAsymptote, faceTangent);
+
+        // TODO: Is there a geometrical description of these?
+        Vector3 toVertex = vertexOne - center;
+        number findAName = wedge2D(toVertex, faceTangent);
+        number determinant = findAName^^2
+            - radius^^2 * positiveAlignment * negativeAlignment;
+
+
+        // I think this is checking whether the interface sits "below"
+        // the saddle of the ray?
+        if (determinant < 0) {
+            // I don't want to throw an error, how else can I do this?
+            // Sentinal values? I don't think D enums can store values?
+            writeln("Skipped face");
+            return false;
+        }
+
+        // Try both solutions
+        // Use `static foreach` with inner scope to unroll at compile-time
+        static foreach (sign; [+1, -1]) {{
+            // "Exponential", "Arc", Cartesian, and "linear" coordinates at intercept
+            number exponential = (findAName + sign * sqrt(determinant)) / positiveAlignment;
+            number arc = (exponential^^2 - radius^^2) / (2 * exponential) * correction;
+            Vector3 cart = center 
+                + positiveAsymptote * (exponential/2) 
+                + negativeAsymptote / (exponential*2);
+            number linear = -dot(cart, faceTangent) / dot(faceTangent, faceTangent);
+
+            writeln(format("Arc length: %.5f", arc - arcCoord));
+            writeln(format("Linear length: %.5f", linear));
+
+            if (
+                linear >= 0 && linear < 1 
+                && arc > arcCoord + number.epsilon
+            ) {
+                arcLength = arc - arcCoord;
+                return true;
+            }
+        }}
+
+        return false;
+    }
+}
+
+@("Hyperbolic Intercept - Triangle")
+unittest {
+    Vector3 point = Vector3(2.0, 1.5, 0.0);
+    Vector3 tangent = Vector3(-1.5, -0.5, 1.5);
+    tangent.normalize();
+
+    writeln(format("Starting direction: %s", tangent));
+
+    HyperbolicRay ray = new HyperbolicRay(tangent, point);
+    // Define our triangle
+    Vector3 vertex0 = Vector3(0.25, 0.5);
+    Vector3 vertex1 = Vector3(3.25, 1.25);
+    Vector3 vertex2 = Vector3(1.5, 3.0);
+
+    number arcLength;
+
+    bool success = ray.intersect(vertex2, vertex0, arcLength);
+    writeln(format("Arclength: %.7f", arcLength));
+    assert(success);
+    assert(isClose(arcLength, 1.72741));
+
+    success = ray.intersect(vertex1, vertex2, arcLength);
+    assert(!success);
+}
+
+
+FVInterface axisymmetric_marching_efficient(
+    size_t cellID, FluidBlock block, Vector3 rayTangent,
+    ref size_t[] crossed, ref number[] lengths
+) {
+    // Placeholder for if we need to do moving grids
+    size_t gtl = 0;
+
+    FluidFVCell currentCell = block.cells[cellID];
+    Vector3 rayCoord = currentCell.pos[gtl];
+    Grid currentGrid = get_grid(block);
+    bool isWithinBlock = true;
+
+    // Working variables
+    FVInterface outgoing;
+    Vector3 vertex_i;
+    Vector3 vertex_j;
+
+    // NOTE: Push all this down into the grid level
+    //       Potentially with the following signature
+
+    /**
+     * Params:
+     *   line = A description of the ray position & orientation
+     *   indx = The cell index to check for intersections at (note, is this enough info?)
+     *   crossings = The interfaces which the line crosses through. The two (2) solutions correspond
+     *               to the nonpositive (<=0) and positive (>0) solutions.
+     */
+    // bool compute_line_intersections(ref Ray line, ref size_t indx, out FVInterface[2] crossings)
+
+    rayTangent.normalize();
+
+    HyperbolicRay ray = new HyperbolicRay(rayTangent, rayCoord);
+
+    writeln("Direction: ", rayTangent);
+
+    while (isWithinBlock) {
+        ndim:
+        switch (currentGrid.dimensions) {
+        case 1:
+            throw new Exception("cell search not implemented for 1D grids");
+        case 2:
+            size_t iface_id;
+            number step_length;
+
+            faces: 
+            foreach (n, iface; currentCell.iface) {
+                vertex_i = iface.vtx[0].pos[gtl];
+                vertex_j = iface.vtx[1].pos[gtl];
+                // Need to ensure the interface is moving anti-clockwise with 
+                // respect to the cell interior
+                if (currentCell.outsign[n] == -1) {
+                    swap(vertex_i, vertex_j);
+                }
+
+                bool success = ray.intersect(vertex_i, vertex_j, step_length);
+                if (success) {
+                    break faces;
+                }
+            }
+
+            if (step_length.isNaN()) {
+                writeln("Something bad has happened...");
+                isWithinBlock = false;
+                break;
+            }
+
+            ray.walkForward(step_length);
+            outgoing = currentCell.iface[iface_id];
+
+            lengths ~= step_length;
+            crossed ~= currentCell.id;
+
+            // WARN: The `currentCell` can be null if crossing a boundary
+            //       with no ghost cell on the other side
+            currentCell = (currentCell.outsign[iface_id] == +1)
+                ? outgoing.right_cell : outgoing.left_cell;
+            // writeln("Stepping ", step_length, " in direction ", rayTangent);
+            // writeln("Stepping across ", outgoing," to cell ", currentCell);
+
+            if (outgoing.is_on_boundary) {
+                isWithinBlock = false;
+            }
+
+            break ndim;
+        case 3:
+            throw new Exception("cell search not implemented for 3D grids");
+        default:
+            throw new Exception("invalid number of dimensions");
+        } // end switch (dimensions)
+    }
+
+    return outgoing;
+}
+
 // FIXME: The step size should probably be dependent on cell size...
 // NOTE: What do we want to return here?
 //       I'm thinking that we could return the FVInterface or BoundaryCondition
