@@ -1,5 +1,5 @@
 
-LMR ?= .
+LMR ?= lmr
 LMR_CMD = $(LMR)/commands
 LMR_LUA_MOD = $(LMR)/lua-modules
 LMR_LUA_WRAP = $(LMR)/luawrap
@@ -28,6 +28,7 @@ LMR_CORE_FILES = $(LMR)/block.d \
 	$(LMR)/history.d \
 	$(LMR)/init.d \
 	$(LMR)/jacobian.d \
+	$(LMR)/lmrconfig.d \
 	$(LMR)/lmrerrors.d \
 	$(LMR)/lmrexceptions.d \
 	$(LMR)/lmrwarnings.d \

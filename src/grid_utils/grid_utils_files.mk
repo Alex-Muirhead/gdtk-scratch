@@ -1,4 +1,4 @@
-GRID_DIR ?= .
+SRC_DIR := $(GRID_DIR)/grid_utils
 
 GRID_FILES := \
-	$(GRID_DIR)/grid_deform.d \
+	$(SRC_DIR)/grid_deform.d \
