@@ -37,7 +37,7 @@ void main(string[] args) {
     writeln("Initial workings on a standalone radiation post-processing code.");
 
     // Hard-code how many snapshots we're working with
-    uint snapshotStart = 0000;
+    uint snapshotStart = 0;
     uint nWrittenSnapshots = snapshotStart + 1;
 
     alias cfg = GlobalConfig;
