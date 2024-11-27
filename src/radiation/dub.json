@@ -19,7 +19,8 @@
 		},
 		{
 			"dependencies": {
-				"silly": "~>1.2.0-dev.2"
+				"silly": "~>1.2.0-dev.2",
+				"fluent-asserts": "~>1.0.1",
 			},
 			"name": "unittest",
 			"targetType": "library"

@@ -207,6 +207,13 @@ private:
     Vector3 negativeAsymptote;
     number correction;
 
+    /**
+     * Constructs a HyperbolicRay instance.
+     *
+     * Params:
+     *   tangent = The tangent vector (Vector3).
+     *   point = The point on the ray (Vector3).
+     */
     this(Vector3 tangent, Vector3 point) {
         arcCoord = (point.y * tangent.y + point.z * tangent.z)
             / (tangent.y ^^ 2 + tangent.z ^^ 2);
@@ -217,7 +224,6 @@ private:
         radius = sqrt(saddle.y ^^ 2 + saddle.z ^^ 2);
         slope = tangent.x / sqrt(1 - tangent.x ^^ 2);
 
-
         // Positive and Negative are defined relative to tangent vector.
         // The arc-coordinate is defined in the same frame.
         positiveAsymptote = Vector3(+slope, 1);
@@ -226,50 +232,49 @@ private:
         correction = sqrt(1 + slope^^2); // Magnitude of asymptote vectors
     }
 
+    /**
+     * Moves the ray forward by the specified arc length.
+     *
+     * Params:
+     *   arcLength = The distance to move forward (number).
+     */
     void walkForward(number arcLength) {
         arcCoord += arcLength;
     }
 
+    /**
+     * Checks if the ray intersects the line segment between two vertices.
+     *
+     * Params:
+     *   vertexOne = The first vertex of the line segment (Vector3).
+     *   vertexTwo = The second vertex of the line segment (Vector3).
+     *   arcLength = The arc length at the intersection point (out parameter) (number).
+     *
+     * Returns:
+     *   true if the ray intersects the line segment, false otherwise.
+     */
     bool intersect(Vector3 vertexOne, Vector3 vertexTwo, out number arcLength) {
-        // Maybe we can use the normal here, and a dot product later?
-        // But then we might need the magnitude later...
-        // Plus, we need to use this to interpolate the intersection point!
+        // Calculate the face tangent vector
         Vector3 faceTangent = vertexTwo - vertexOne;
         
-        // Which way does the interface-normal "point"
-        // Is a +'ve value an agreement?
-        // Note that a face can align with *both*
-        // 
-        // 1. If they have the same sign, the interface is _shallower_ than
-        //    the hyperboloid, and we need to check if its internal to the throat.
-        //    If its external to the throat, the infinite line is guaranteed to intersect.
-        // 
-        // 2. If they have different signs, the interface is _steeper_ than 
-        //    the hyperboloid, and the infinite line is guaranteed to intersect.
-
+        // Calculate the alignment of the face tangent with the asymptotes
         number positiveAlignment = wedge2D(positiveAsymptote, faceTangent);
         number negativeAlignment = wedge2D(negativeAsymptote, faceTangent);
 
-        // TODO: Is there a geometrical description of these?
+        // Calculate the vector from the center to the first vertex
         Vector3 toVertex = vertexOne - center;
         number findAName = wedge2D(toVertex, faceTangent);
         number determinant = findAName^^2
             - radius^^2 * positiveAlignment * negativeAlignment;
 
-
-        // I think this is checking whether the interface sits "below"
-        // the saddle of the ray?
+        // Check if the determinant is negative (no intersection)
         if (determinant < 0) {
-            // I don't want to throw an error, how else can I do this?
-            // Sentinal values? I don't think D enums can store values?
-            writeln("Skipped face");
             return false;
         }
 
-        // Try both solutions
-        // Use `static foreach` with inner scope to unroll at compile-time
+        // Try both solutions using static foreach
         static foreach (sign; [+1, -1]) {{
-            // "Exponential", "Arc", Cartesian, and "linear" coordinates at intercept
+            // Calculate the exponential, arc, Cartesian, and linear coordinates at the intercept
             number exponential = (findAName + sign * sqrt(determinant)) / positiveAlignment;
             number arc = (exponential^^2 - radius^^2) / (2 * exponential) * correction;
             Vector3 cart = center 
@@ -277,9 +282,7 @@ private:
                 + negativeAsymptote / (exponential*2);
             number linear = -dot(cart, faceTangent) / dot(faceTangent, faceTangent);
 
-            writeln(format("Arc length: %.5f", arc - arcCoord));
-            writeln(format("Linear length: %.5f", linear));
-
+            // Check if the intersection point is within the line segment and ahead of the current ray position
             if (
                 linear >= 0 && linear < 1 
                 && arc > arcCoord + number.epsilon
@@ -295,27 +298,32 @@ private:
 
 @("Hyperbolic Intercept - Triangle")
 unittest {
+    import fluent.asserts;
+    
     Vector3 point = Vector3(2.0, 1.5, 0.0);
     Vector3 tangent = Vector3(-1.5, -0.5, 1.5);
     tangent.normalize();
 
-    writeln(format("Starting direction: %s", tangent));
+    // writeln(format("Starting direction: %s", tangent));
 
     HyperbolicRay ray = new HyperbolicRay(tangent, point);
-    // Define our triangle
+    
+    // Define triangle vertices
     Vector3 vertex0 = Vector3(0.25, 0.5);
     Vector3 vertex1 = Vector3(3.25, 1.25);
     Vector3 vertex2 = Vector3(1.5, 3.0);
 
     number arcLength;
 
+    // Test intersection with triangle edge vertex2 to vertex0
     bool success = ray.intersect(vertex2, vertex0, arcLength);
-    writeln(format("Arclength: %.7f", arcLength));
-    assert(success);
-    assert(isClose(arcLength, 1.72741));
+    // writeln(format("Arclength: %.7f", arcLength));
+    Assert.equal(success, true);
+    Assert.approximately(arcLength, 1.72741, 1e-5);
 
+    // Test intersection with triangle edge vertex1 to vertex2 (should fail)
     success = ray.intersect(vertex1, vertex2, arcLength);
-    assert(!success);
+    Assert.equal(success, false);
 }
 
 
@@ -352,8 +360,6 @@ FVInterface axisymmetric_marching_efficient(
 
     HyperbolicRay ray = new HyperbolicRay(rayTangent, rayCoord);
 
-    writeln("Direction: ", rayTangent);
-
     while (isWithinBlock) {
         ndim:
         switch (currentGrid.dimensions) {
@@ -380,7 +386,7 @@ FVInterface axisymmetric_marching_efficient(
             }
 
             if (step_length.isNaN()) {
-                writeln("Something bad has happened...");
+                throw new Exception("Something bad has happened...");
                 isWithinBlock = false;
                 break;
             }
