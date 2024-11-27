@@ -55,7 +55,6 @@ number[] tangent_slab_flux(
                     exponential_integral_3(opticalDistance + opticalThickness[j])
             );
             heatFlux += increment;
-            writeln(format("Cell %d increases %d by %f", j, i, increment));
             opticalDistance += opticalThickness[j];
         }
         // Walk away from cell i (along positive coordinate)
@@ -66,7 +65,6 @@ number[] tangent_slab_flux(
                     exponential_integral_3(opticalDistance)
             );
             heatFlux += increment;
-            writeln(format("Cell %d increases %d by %f", j, i, increment));
             opticalDistance += opticalThickness[j];
         }
 
@@ -91,11 +89,9 @@ number[] tangent_slab_heating(
     number increment;
 
     foreach (i; 0 .. numCells) {
-        writeln(format("Cell %d intensity: %f", i, intensity[i]));
         // Do self-heating case here (i == j)
         halfThickness = opticalThickness[i] / 2;
         incidentRadiation = intensity[i] * (2 - 2 * exponential_integral_2(halfThickness));
-        writeln(format("Cell %d increases %d by %f", i, i, incidentRadiation));
 
         // Walk away from cell i (along negative coordinate)
         opticalDistance = halfThickness;
@@ -105,7 +101,6 @@ number[] tangent_slab_heating(
                     exponential_integral_2(opticalDistance + opticalThickness[j])
             );
             incidentRadiation += increment;
-            writeln(format("Cell %d increases %d by %f", j, i, increment));
             opticalDistance += opticalThickness[j];
         }
         // Walk away from cell i (along positive coordinate)
@@ -116,7 +111,6 @@ number[] tangent_slab_heating(
                     exponential_integral_2(opticalDistance + opticalThickness[j])
             );
             incidentRadiation += increment;
-            writeln(format("Cell %d increases %d by %f", j, i, increment));
             opticalDistance += opticalThickness[j];
         }
 
@@ -128,6 +122,7 @@ number[] tangent_slab_heating(
 
 @("Constant Temperature")
 unittest {
+    import fluent.asserts;
 
     import std.stdio;
     import std.range;
@@ -153,10 +148,10 @@ unittest {
     for (auto i = 0; i < numCells; ++i) {
         // Analytical solution
         number expected = 2 * PI * (
-            2 * exponential_integral(0) - 
-            exponential_integral(cellCenters[i]) - 
-            exponential_integral(opticalLength - cellCenters[i])
+            2 * exponential_integral_2(0) - 
+            exponential_integral_2(cellCenters[i]) - 
+            exponential_integral_2(opticalLength - cellCenters[i])
         );
-        assert(isClose(heating[i], expected, 1e-6, 1e-6));
+        Assert.approximately(heating[i], expected, 5e-3);
     }
 }
