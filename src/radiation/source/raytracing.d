@@ -25,6 +25,7 @@ import lmr.ufluidblock : UFluidBlock;
 // External packages
 import progress.bar;
 import mir.random.engine;
+import mirRandom = mir.random.engine;
 import mir.random.ndvariable : sphereVar;
 
 Grid get_grid(FluidBlock block) {
@@ -40,6 +41,7 @@ Grid get_grid(FluidBlock block) {
 
 void trace_rays(FluidBlock block, number absorptionCoefficient) {
     auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
+    auto rne = mirRandom.Random(4);
     uint angleSamples = 967;
     // NOTE: Using angleSamples of 1000 causes NaN values. Weird??
 
