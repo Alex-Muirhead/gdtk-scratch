@@ -27,7 +27,6 @@
     "turbulence" 
   ],
   "preGenerateCommands": ["cd $DUB_PACKAGE_DIR && ./build-info.sh"],
-  "postGenerateCommands": ["cd $DUB_PACKAGE_DIR && rm build-info.json"],
   "configurations": [
     {
       "name": "executable",
