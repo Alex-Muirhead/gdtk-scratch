@@ -2,6 +2,7 @@
 	"fileVersion": 1,
 	"versions": {
 		"ceq": {"path":"../extern/ceq"},
+		"cybuf": "1.0.0",
 		"ddmp": "0.0.1-0.dev.3",
 		"dyaml": {"path":"../extern/D-YAML"},
 		"either": "1.1.3",

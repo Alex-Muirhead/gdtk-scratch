@@ -1,6 +1,7 @@
 import std.algorithm.mutation : swap;
 import std.algorithm : min, max;
 import std.array;
+import std.format;
 import std.math : cos, sin, PI, pow, fabs;
 import std.stdio;
 import std.getopt;
@@ -57,6 +58,8 @@ void main(string[] args) {
     initFullFaceDataExchange();
     initMappedCellDataExchange();
     initGhostCellGeometry();
+
+    writeln(format("Axisymmetric? %s", cfg.axisymmetric));
 
     // Set everything to zero initially
     // FIXME: This is because of some weird buffer thing in loading

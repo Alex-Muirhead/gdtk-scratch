@@ -51,7 +51,7 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
 
     Bar progressBar = new Bar();
     progressBar.message = { return "Ray-tracing progress"; };
-    progressBar.suffix = { return format("%6.2f%%", progressBar.percent); };
+    progressBar.suffix = { return format("%6.2f%%\n", progressBar.percent); };
     progressBar.max = angleSamples * block.cells.length;
 
     foreach (cell_id, ref origin; block.cells) {
@@ -107,17 +107,19 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
 interface Ray {
     void walkForward(number length);
     bool intersect(Vector3 vertexOne, Vector3 vertexTwo, out number length);
+    // Vector3 currentPoint();
 }
 
 class CartesianRay : Ray {
 public:
     Vector3 terminus;
     Vector3 tangent;
-    number coord;
+    number linearCoord;
 
     this(Vector3 tangent, Vector3 terminus) {
         this.tangent = tangent;
         this.terminus = terminus;
+        this.linearCoord = 0.0;
     }
 
     /**
@@ -127,7 +129,11 @@ public:
      *   length = The distance to move forward (number).
      */
     void walkForward(number length) {
-        coord += length;
+        linearCoord += length;
+    }
+
+    Vector3 currentPoint() {
+        return terminus + linearCoord * tangent;
     }
 
     /**
@@ -146,11 +152,15 @@ public:
         // NOTE: Could potentially use iface.t1 for this?
         //       Probably not, since we need a non-normalised vec 
         Vector3 faceTangent = vertexTwo - vertexOne;
-        Vector3 toVertex = terminus - vertexOne;
+        Vector3 toVertex = this.currentPoint() - vertexOne;
 
         number alignment = wedge2D(faceTangent, tangent);
         number s = wedge2D(toVertex, faceTangent) / alignment;
         number t = wedge2D(toVertex, tangent) / alignment;
+
+        debug {
+            writeln(format("[TRACE] t = %.5f, s = %.5f, alignment = %.2f", t, s, alignment));
+        }
 
         // There should only be a single solution if the cell is convex
         if (t >= 0 && t < 1 && s > 1E5 * number.epsilon) {
@@ -166,12 +176,15 @@ class HyperbolicRay : Ray {
 public:
     Vector3 center;
     number radius;
-    number slope;
-    number arcCoord;
+    number linearCoord;
 private:
+    number semiMajor;  // a
+    number semiMinor;  // b
+
     Vector3 positiveAsymptote;
     Vector3 negativeAsymptote;
     number correction;
+    number slope;
 
 public:
     /**
@@ -179,29 +192,39 @@ public:
      *
      * Params:
      *   tangent = The tangent vector (Vector3).
-     *   point = The point on the ray (Vector3).
+     *   terminus = The origin point of the ray (Vector3).
      */
     this(Vector3 tangent, Vector3 terminus) {
-        arcCoord = (terminus.y * tangent.y + terminus.z * tangent.z)
+        number eccentricity = 1 / sqrt(tangent.y ^^ 2 + tangent.z ^^ 2);
+        // assert eccentricity > 1.0;
+        semiMajor = fabs(terminus.y * tangent.z - terminus.z * tangent.y) * eccentricity;  // = a
+        semiMinor = semiMajor * sqrt(eccentricity ^^ 2 - 1.0); // = b
+        number linearEccentricity = semiMajor * eccentricity;  // = c
+        
+        linearCoord = (terminus.y * tangent.y + terminus.z * tangent.z)
             / (tangent.y ^^ 2 + tangent.z ^^ 2);
 
-        Vector3 saddle = terminus - tangent * arcCoord;
+        Vector3 saddle = terminus - tangent * linearCoord;
 
-        center = Vector3(saddle.x, 0.0);
-        radius = sqrt(saddle.y ^^ 2 + saddle.z ^^ 2);
-        slope = tangent.x / sqrt(1 - tangent.x ^^ 2);
+        center = Vector3(saddle.x, 0.0);  // = f_0
+        radius = sqrt(saddle.y ^^ 2 + saddle.z ^^ 2);  // = a (will always be >=0)
+        slope = tangent.x / sqrt(1 - tangent.x ^^ 2);  // = b / a (sign can change!)
 
         // Positive and Negative are defined relative to tangent vector.
         // The arc-coordinate is defined in the same frame.
-        positiveAsymptote = Vector3(+slope, 1);
-        negativeAsymptote = Vector3(-slope, 1);
-
-        // writeln(format("[DEBUG] Hyperbolic ray -> Center: %s, Radius: %s, Slope: %f", center, radius, slope));
-        // writeln(format("                       -> Asymptote pos: %s, neg: %s", positiveAsymptote, negativeAsymptote));
+        positiveAsymptote = Vector3(+slope * radius, radius);
+        negativeAsymptote = Vector3(-slope * radius, radius);
 
         correction = sqrt(1 + slope ^^ 2); // Magnitude of asymptote vectors
     }
 
+    /** 
+     * Evaluate the tangent to the hyperbola. 
+     *
+     * Params:
+     *   localArcCoord = The arc-coordinate to evaluate the tangent at (number).
+     * Returns: 
+     */
     Vector3 localTangent(number localArcCoord) {
         // (positiveAsymptote - negativeAsymptote) / 2
         // and (positiveAsymptote + negativeAsymptote) / 2
@@ -216,7 +239,7 @@ public:
      *   arcLength = The distance to move forward (number).
      */
     void walkForward(number arcLength) {
-        arcCoord += arcLength;
+        linearCoord += arcLength;
     }
 
     /**
@@ -238,19 +261,27 @@ public:
         number positiveAlignment = wedge2D(positiveAsymptote, faceTangent);
         number negativeAlignment = wedge2D(negativeAsymptote, faceTangent);
 
-        // writeln(format("[DEBUG] Positive Alignment: %e", positiveAlignment));
-        // writeln(format("[DEBUG] Negative Alignment: %e", negativeAlignment));
-
         // Calculate the vector from the center to the first vertex
         Vector3 toVertex = vertexOne - center;
-        number findAName = wedge2D(toVertex, faceTangent);
-        number determinant = findAName ^^ 2
-            - radius ^^ 2 * positiveAlignment * negativeAlignment;
 
-        // writeln(format("[DEBUG] Determinant: %e", determinant));
+        number positiveBeta = wedge2D(toVertex, faceTangent) / positiveAlignment;
+        number negativeBeta = wedge2D(toVertex, faceTangent) / negativeAlignment;
+
+        number areaRatio = (positiveBeta * negativeBeta);
+        // Needs an area ratio greater than 1 to have any intersection
+        if (areaRatio < 1) {
+            return false;
+        }
+        // Potentially, if areaRatio >> 1, we can drop back to linear?
+
+        number bias = sqrt(1 - 1 / areaRatio);
+        number exponential_ = positiveBeta * (1 + bias); // or positiveBeta * (1 - bias);
+
+        number findAName = wedge2D(toVertex, faceTangent);
+        number determinant = findAName ^^ 2 - positiveAlignment * negativeAlignment;
+
         // Check if the determinant is negative (no intersection)
         if (determinant < 0) {
-    //         writeln("[INFO]  Skipped face");
             return false;
         }
 
@@ -264,28 +295,19 @@ public:
                 // Calculate the exponential, arc, Cartesian, and linear coordinates at the intercept
                 number exponential = (findAName + sign * sqrt(determinant)) / positiveAlignment;
                 if (exponential < 0) {
-                //     writeln(format("[TRACE] Skipping mirror solution"));
                     continue;
                 }
 
-                number arc = (exponential ^^ 2 - radius ^^ 2) / (2 * exponential) * correction;
+                number arc = (exponential ^^ 2 - 1) / (2 * exponential) * correction * radius;
                 number crossingDirection = wedge2D(localTangent(arc), faceTangent);
-        //         writeln(format("[DEBUG] Local tangent: %s", localTangent(arc)));
-        //         writeln(format("[DEBUG] Crossing direction: %e", crossingDirection));
+                // writeln(format("[DEBUG] Local tangent: %s", localTangent(arc)));
+                // writeln(format("[DEBUG] Crossing direction: %e", crossingDirection));
 
                 Vector3 cartesian = center
                     + positiveAsymptote * (exponential / 2)
-                    + negativeAsymptote / (exponential * 2) * radius ^^ 2;
+                    + negativeAsymptote / (exponential * 2);
                 Vector3 translation = cartesian - vertexOne;
                 number linear = dot(translation, faceTangent) / dot(faceTangent, faceTangent);
-
-        //         writeln(format("[DEBUG] Pos part: %s", positiveAsymptote * (exponential / 2)));
-        //         writeln(format("[DEBUG] Neg part: %s", negativeAsymptote / (exponential * 2) * radius ^^ 2));
-
-        //         writeln(format("[DEBUG] Exponential coord: %f", exponential));
-        //         writeln(format("[DEBUG] Arc step: %e, from: %e, to: %s", arc - arcCoord, arcCoord, arc));
-        //         writeln(format("[DEBUG] Cartesian coord: %s", cartesian));
-        //         writeln(format("[DEBUG] Linear coord: %f", linear));
 
                 // Check if the intersection point is within the line segment
                 // and ahead of the current ray position
@@ -295,10 +317,10 @@ public:
                     // i.e. comparing the current tangent to the face tangent?
                     // since we only care about *leaving* the current face.
                     // We could add a parameter for positive or negative crossing
-                    && arc > arcCoord
+                    && arc > linearCoord
                     && crossingDirection > 0
                 ) {
-                    arcLength = arc - arcCoord;
+                    arcLength = arc - linearCoord;
                     return true;
                 }
             }
@@ -385,20 +407,48 @@ FVInterface marching_efficient(
                     swap(vertex_i, vertex_j);
                 }
 
-                // writeln(format("[TRACE] Checking vertex pair %s, %s", vertex_i, vertex_j));
+                // debug {
+                //     writeln(format("[TRACE] Checking vertex pair %s, %s", vertex_i, vertex_j));
+                // }
 
                 bool success = ray.intersect(vertex_i, vertex_j, step_length);
                 if (success) {
-    //                 writeln(format("[INFO]  Crossing interface %d", n));
+                    // debug {
+                    //     writeln(format("[INFO]  Crossing interface %d", n));
+                    // }
                     iface_id = n;
                     break faces;
                 }
             }
 
-            if (step_length.isNaN()) {
-                throw new Exception("Something bad has happened...");
-                isWithinBlock = false;
-                break;
+            debug {
+                if (step_length.isNaN()) {
+                    writeln(format("[TRACE] Failed at cell %s", currentCell.id));
+                    writeln(format("[TRACE] Coords [%s, %s, %s, %s]", currentCell.vtx[0].pos, currentCell.vtx[1].pos, currentCell.vtx[2].pos, currentCell.vtx[3].pos));
+                    auto hyper_ray = cast(HyperbolicRay) ray;
+                    if (hyper_ray) {
+                        writeln(format("[TRACE] Failed with ray: \n\tdirection: %s", hyper_ray.localTangent(hyper_ray.linearCoord)));
+                        writeln(format("[TRACE] \tcoord: %s\n\ttangent: %s", rayCoord, rayTangent));
+                    }
+
+                    // Re-run this, and print debug values
+                    foreach (n, iface; currentCell.iface) {
+                        vertex_i = iface.vtx[0].pos[gtl];
+                        vertex_j = iface.vtx[1].pos[gtl];
+                        // Need to ensure the interface is moving anti-clockwise with 
+                        // respect to the cell interior
+                        if (currentCell.outsign[n] == -1) {
+                            swap(vertex_i, vertex_j);
+                        }
+
+                        bool _ = ray.intersect(vertex_i, vertex_j, step_length);
+                        writeln(format("[TRACE] Checking vertex pair (%s, %s), got length %s", vertex_i, vertex_j, step_length));
+                    }
+
+                    throw new Exception("Something bad has happened...");
+                    isWithinBlock = false;
+                    break;
+                }
             }
 
             ray.walkForward(step_length);
@@ -407,12 +457,21 @@ FVInterface marching_efficient(
             lengths ~= step_length;
             crossed ~= currentCell.id;
 
+            debug {
+                if ((crossed.length >= 4) && (crossed[$-1] == crossed[$-3]) && (crossed[$-2] == crossed[$-4])) {
+                    throw new Exception("Loop found within ray-tracing, exiting.");
+                }
+            }
+
             // WARN: The `currentCell` can be null if crossing a boundary
             //       with no ghost cell on the other side
             currentCell = (currentCell.outsign[iface_id] == +1)
                 ? outgoing.right_cell : outgoing.left_cell;
-            // writeln("Stepping ", step_length, " in direction ", rayTangent);
-            // writeln("Stepping across ", outgoing," to cell ", currentCell);
+
+            // debug {
+            //     writeln("Stepping ", step_length, " in direction ", rayTangent);
+            //     writeln("Stepping across ", outgoing.id," to cell ", currentCell.id);
+            // }
 
             if (outgoing.is_on_boundary) {
                 isWithinBlock = false;
@@ -449,13 +508,21 @@ FVInterface marching_efficient(
  *   The interface which was intersected
  */
 FVInterface marching_full(
-    size_t cellID, FluidBlock block, Vector3 direction,
-    ref size_t[] crossed, ref number[] lengths) {
+    size_t cellID, FluidBlock block, Vector3 rayTangent, bool axisymmetric, 
+    ref size_t[] crossed, ref number[] lengths
+) {
     bool isWithinBlock = true;
     bool isContained;
     FluidFVCell currentCell = block.cells[cellID];
     Vector3 rayCoord = currentCell.pos[0]; // INFO: Grid is stationary, index is time
     Grid currentGrid = get_grid(block);
+
+    Ray ray;
+    if (axisymmetric) { 
+        ray = new HyperbolicRay(rayTangent, rayCoord);
+    } else {
+        ray = new CartesianRay(rayTangent, rayCoord);
+    }
 
     number stepSize = 1E-03; // FIXME: This should be proportional to something...
     int consecutiveSteps = 1;
@@ -464,7 +531,8 @@ FVInterface marching_full(
     // NOTE: Do we want to record the first step?
 
     marchLoop: while (isWithinBlock) {
-        rayCoord += stepSize * direction;
+        ray.walkForward(stepSize);
+        rayCoord += stepSize * rayTangent;
         isContained = currentGrid.point_is_inside_cell(rayCoord, currentCell.id);
 
         if (isContained) {
