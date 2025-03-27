@@ -18,6 +18,13 @@
 			"targetType": "executable"
 		},
 		{
+			"mainSourceFile": "source/intensity_tracing.d",
+			"name": "intensity",
+			"targetName": "lmr-intensity",
+			"targetPath": "$INSTALL_DIR/bin",
+			"targetType": "executable"
+		},
+		{
 			"dependencies": {
 				"fluent-asserts": "~>1.0.1",
 				"silly": ">=1.2.0-dev.2 <1.3.0-0"

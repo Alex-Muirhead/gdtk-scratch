@@ -9,7 +9,7 @@ import nm.number : number;
 interface Ray {
     void walkForward(number length);
     bool intersect(Vector3 vertexOne, Vector3 vertexTwo, out number length);
-    // Vector3 currentPoint();
+    Vector3 currentPoint();
 }
 
 class CartesianRay : Ray {
@@ -113,8 +113,7 @@ public:
         semiMinor = tangent.x * semiMajor * eccentricity; // = b
         linearEccentricity = semiMajor * eccentricity; // = c
 
-        rayCoord = (terminus.y * tangent.y + terminus.z * tangent.z)
-            / (tangent.y ^^ 2 + tangent.z ^^ 2);
+        rayCoord = (terminus.y * tangent.y + terminus.z * tangent.z) / (tangent.y ^^ 2 + tangent.z ^^ 2);
 
         Vector3 saddle = terminus - tangent * rayCoord;
 
@@ -134,17 +133,17 @@ public:
      * Evaluate the tangent to the hyperbola. 
      *
      * Params:
-     *   localArcCoord = The arc-coordinate to evaluate the tangent at (number). This is s
+     *   rayCoord = The rayCoord to evaluate the tangent at (number). This is s
      * Returns: 
      */
-    Vector3 localTangent(number localArcCoord) {
-        // (positiveAsymptote - negativeAsymptote) / 2
-        // and (positiveAsymptote + negativeAsymptote) / 2
-        number adjustedCoord = localArcCoord / linearEccentricity; // This is s'
-        return Vector3(
-                semiMinor,
-                semiMajor * adjustedCoord / sqrt(1 + adjustedCoord ^^ 2)
-        );
+    Vector3 localTangent(number rayCoord) {
+        number normCoord = rayCoord / linearEccentricity; // This is s'
+        return Vector3(semiMinor, semiMajor * normCoord / sqrt(1 + normCoord ^^ 2));
+    }
+
+    Vector3 currentPoint() {
+        number normCoord = rayCoord / linearEccentricity; // s'
+        return center + Vector3(semiMinor * normCoord, semiMajor * sqrt(1 + normCoord ^^ 2));
     }
 
     /**
@@ -168,7 +167,7 @@ public:
      * Returns:
      *   true if the ray intersects the line segment, false otherwise.
      */
-    bool intersect(Vector3 vertexOne, Vector3 vertexTwo, out number arcLength) {
+    bool intersect(Vector3 vertexOne, Vector3 vertexTwo, out number length) {
         // Calculate the face tangent vector
         Vector3 faceTangent = vertexTwo - vertexOne;
         // Calculate the vector from the center to the first vertex
@@ -194,31 +193,26 @@ public:
         foreach (sign; [+1, -1]) {
             {
                 // Calculate the exponential, arc, Cartesian, and linear coordinates at the intercept
-                number exponential = positiveBeta * (1 + sign * bias);
-                if (exponential < 0) {
+                number expHypAngle = positiveBeta * (1 + sign * bias);
+                if (expHypAngle < 0) {
                     continue;
                 }
 
-                number arc = (exponential ^^ 2 - 1) / (2 * exponential) * linearEccentricity;
-                number crossingDirection = wedge2D(localTangent(arc), faceTangent);
+                number interceptCoord = (expHypAngle ^^ 2 - 1) / (2 * expHypAngle) * linearEccentricity;
+                number crossingDirection = wedge2D(localTangent(interceptCoord), faceTangent);
                 if (crossingDirection < 0) {
                     continue;
                 }
 
-                Vector3 cartesian = center
-                    + positiveAsymptote * (
-                            exponential / 2)
-                    + negativeAsymptote / (exponential * 2);
+                Vector3 cartesian = center + positiveAsymptote * (expHypAngle / 2) + negativeAsymptote / (
+                    expHypAngle * 2);
                 Vector3 translation = cartesian - vertexOne;
                 number linear = dot(translation, faceTangent) / dot(faceTangent, faceTangent);
 
                 // Check if the intersection point is within the line segment
                 // and ahead of the current ray position
-                if (
-                    linear >= 0 && linear < 1
-                        && arc > rayCoord
-                    ) {
-                    arcLength = arc - rayCoord;
+                if (linear >= 0 && linear < 1 && interceptCoord > rayCoord) {
+                    length = interceptCoord - rayCoord;
                     return true;
                 }
             }
