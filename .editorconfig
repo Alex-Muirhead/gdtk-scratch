@@ -1,0 +1,20 @@
+# editorconfig.org
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.d]
+indent_style = space
+indent_size = 4
+# -- dfmt-specific configs
+dfmt_brace_style = otbs
+dfmt_keep_line_breaks = true
+dfmt_single_indent = true
+dfmt_soft_max_line_length = 100
+
+[*.lua]
+indent_size = 3
