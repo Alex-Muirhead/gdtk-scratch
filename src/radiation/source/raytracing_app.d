@@ -29,13 +29,23 @@ import raytracing;
 
 void main(string[] args) {
 
+    // Default arg values
     string workingDir = ".";
-    getopt(args,
-        std.getopt.config.stopOnFirstNonOption,
-        "d|dir", &workingDir
+    double absorptionCoefficient = 1.0;
+
+    auto helpInformation = getopt(
+        args, std.getopt.config.stopOnFirstNonOption,
+        "d|dir", &workingDir,
+        "k|absorptivity", &absorptionCoefficient
     );
 
+    if (helpInformation.helpWanted) {
+        defaultGetoptPrinter("lmr-raytrace options.", helpInformation.options);
+        return;
+    }
+
     writeln("Initial workings on a standalone radiation post-processing code.");
+    writeln(format("Absorptivity: %.2g", absorptionCoefficient));
 
     // Hard-code how many snapshots we're working with
     uint snapshotStart = 0;
@@ -74,7 +84,6 @@ void main(string[] args) {
     string dirName = snapshotDirectory(nWrittenSnapshots);
     ensure_directory_is_present(dirName);
 
-    double absorptionCoefficient = 1.0;
     FluidBlock block = localFluidBlocks[0];
 
     uint wallSide = Face.east;
@@ -87,8 +96,6 @@ void main(string[] args) {
         auto fileName = fluidFilename(nWrittenSnapshots, blk.id);
         FVCell[] cells;
         cells.length = blk.cells.length;
-        //       +-- Enumeration count
-        //       v  vvv-- Makes c a pointer, so we can assign back to cells
         foreach (i, ref c; cells) {
             c = blk.cells[i];
         }
