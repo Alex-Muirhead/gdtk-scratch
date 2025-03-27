@@ -29,10 +29,7 @@ import tangentslab;
 void main(string[] args) {
 
     string workingDir = ".";
-    getopt(args,
-        std.getopt.config.stopOnFirstNonOption,
-        "d|dir", &workingDir
-    );
+    getopt(args, std.getopt.config.stopOnFirstNonOption, "d|dir", &workingDir);
 
     writeln("Initial workings on a standalone radiation post-processing code.");
 
@@ -118,17 +115,14 @@ void main(string[] args) {
     }
 }
 
-FVInterface naive_tangent_marching(
-    size_t cellID, FluidBlock block, uint rayDirection,
-    ref size_t[] crossed, ref number[] lengths
-) {
+FVInterface naive_tangent_marching(size_t cellID, FluidBlock block, uint rayDirection,
+    ref size_t[] crossed, ref number[] lengths) {
     FluidFVCell currentCell = block.cells[cellID];
     // Grid currentGrid = get_grid(block); // NOTE: Could use the grid for direction?
 
     while (true) {
         crossed ~= currentCell.id;
-        lengths ~= distance_between(
-            currentCell.iface[rayDirection].pos,
+        lengths ~= distance_between(currentCell.iface[rayDirection].pos,
             currentCell.iface[opposite_face(rayDirection)].pos);
 
         // This appears to be the best way to check if we hit an edge

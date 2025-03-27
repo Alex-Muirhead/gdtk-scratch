@@ -8,10 +8,7 @@ import geom;
 void main(string[] args) {
 
     string workingDir = ".";
-    getopt(args,
-        std.getopt.config.stopOnFirstNonOption,
-        "d|dir", &workingDir
-    );
+    getopt(args, std.getopt.config.stopOnFirstNonOption, "d|dir", &workingDir);
 
     auto width = 1.0;
     auto height = 10.0;
@@ -26,9 +23,10 @@ void main(string[] args) {
     auto d = Vector3(0, height, 0);
     auto patch = new CoonsPatch(a, b, c, d);
 
-    auto sgrid = new StructuredGrid(patch, 4+1, 4+1, []);
+    auto sgrid = new StructuredGrid(patch, 4 + 1, 4 + 1, []);
     writeln("Structured Grid is ", sgrid);
 
-    auto usgrid = new UnstructuredGrid(sgrid, new_label: "simple");
+    auto usgrid = new UnstructuredGrid(sgrid, new_label:
+        "simple");
     writeln("Unstructured Grid is ", usgrid);
 }
