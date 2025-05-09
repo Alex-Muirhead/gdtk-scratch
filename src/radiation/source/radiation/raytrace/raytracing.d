@@ -1,4 +1,4 @@
-module raytracing;
+module radiation.raytrace.raytracing;
 
 // Standard modules
 import std.algorithm.iteration : sum;
@@ -62,15 +62,15 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
         number selfAbsorbed = 0.0;
 
         foreach (a; 0 .. angleSamples) {
-            // number[3] angleVector;
-            // sphereVar()(rne, angleVector); // TODO: Check if this is _true_ SO3
+            number[3] angleVector;
+            sphereVar()(rne, angleVector); // TODO: Check if this is _true_ SO3
 
             // number angle = angleGenerator(rne);
-            number angle = (double(a) / double(angleSamples) + 1E-6) * 2 * PI;
+            // number angle = (double(a) / double(angleSamples) + 1E-6) * 2 * PI;
 
             // Vector3 direction = Vector3([angleVector[0], angleVector[1], 0]);
-            // Vector3 direction = Vector3([angleVector[0], angleVector[1], angleVector[2]]);
-            Vector3 direction = Vector3([0.0, cos(angle), sin(angle)]);
+            Vector3 direction = Vector3([angleVector[0], angleVector[1], angleVector[2]]);
+            // Vector3 direction = Vector3([0.0, cos(angle), sin(angle)]);
 
             // number mu = sqrt(1 - angleVector[2] ^^ 2);
             number mu = 1;
@@ -82,7 +82,7 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
             size_t[] rayCells;
             number[] rayLengths;
 
-            FVInterface inter = marching_efficient(cell_id, block, direction, true, rayCells, rayLengths);
+            FVInterface inter = marching_efficient(cell_id, block, direction, false, rayCells, rayLengths);
             // FVInterface inter = marching_full(cell_id, block, direction,
             //     true, rayCells, rayLengths);
 
@@ -114,7 +114,7 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
                 number opticalThickness = absorptionCoefficient * rayLengths[i] / mu;
                 number heating = rayEnergy * (1 - exp(-opticalThickness));
                 // if (rayCells[i] == 1) {
-                //     writeln(format("Recieved %.3g from cell %d", heating, cell_id));   
+                //     writeln(format("Recieved %.3g from cell %d", heating, cell_id));
                 // }
                 if (rayCells[i] == cell_id) {
                     selfAbsorbed += heating;
@@ -135,11 +135,11 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
 
             energyLost += rayEnergy;
 
-            // progressBar.next();
+            progressBar.next();
         }
 
-        writeln(format("[TRACE] Cell %d, self absorbed: %.6g%%", cell_id,
-                selfAbsorbed / fullEmissionEnergy * 100));
+        // writeln(format("[TRACE] Cell %d, self absorbed: %.6g%%", cell_id,
+        //         selfAbsorbed / fullEmissionEnergy * 100));
     }
 
     progressBar.finish();
@@ -243,7 +243,7 @@ FVInterface marching_efficient(size_t cellID, FluidBlock block,
         faces: foreach (n, iface; currentCell.iface) {
                 vertex_i = iface.vtx[0].pos[gtl];
                 vertex_j = iface.vtx[1].pos[gtl];
-                // Need to ensure the interface is moving anti-clockwise with 
+                // Need to ensure the interface is moving anti-clockwise with
                 // respect to the cell interior
                 if (currentCell.outsign[n] == -1) {
                     swap(vertex_i, vertex_j);
@@ -270,7 +270,7 @@ FVInterface marching_efficient(size_t cellID, FluidBlock block,
                     foreach (n, iface; currentCell.iface) {
                         vertex_i = iface.vtx[0].pos[gtl];
                         vertex_j = iface.vtx[1].pos[gtl];
-                        // Need to ensure the interface is moving anti-clockwise with 
+                        // Need to ensure the interface is moving anti-clockwise with
                         // respect to the cell interior
                         if (currentCell.outsign[n] == -1) {
                             swap(vertex_i, vertex_j);
@@ -406,7 +406,7 @@ FVInterface marching_full(size_t cellID, FluidBlock block, Vector3 rayTangent,
         faces: foreach (n, iface; currentCell.iface) {
             vertex_i = iface.vtx[0].pos[gtl];
             vertex_j = iface.vtx[1].pos[gtl];
-            // Need to ensure the interface is moving anti-clockwise with 
+            // Need to ensure the interface is moving anti-clockwise with
             // respect to the cell interior
             if (currentCell.outsign[n] == -1) {
                 swap(vertex_i, vertex_j);
