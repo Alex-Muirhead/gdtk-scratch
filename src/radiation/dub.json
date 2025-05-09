@@ -31,7 +31,7 @@
 			},
 			"name": "unittest",
 			"targetType": "library"
-		},
+		}
 	],
 	"copyright": "Copyright © 2024, Alex Muirhead",
 	"dependencies": {
@@ -42,7 +42,8 @@
 			"path": ".."
 		},
 		"mir-random": "~>2.2.19",
-		"progress": "~>5.0.2"
+		"progress": "~>5.0.2",
+		"singlog": "~>1.0.1"
 	},
 	"description": "Radiation Transport Solver",
 	"license": "GPL-3.0",

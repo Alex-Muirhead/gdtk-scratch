@@ -1,7 +1,7 @@
 module radiation.raytrace.raytracing;
 
 // Standard modules
-import std.algorithm.iteration : sum;
+import std.algorithm.iteration : sum, map;
 import std.conv : to;
 import std.stdio;
 import std.format;
@@ -27,11 +27,12 @@ import lmr.ufluidblock : UFluidBlock;
 import rays : Ray, HyperbolicRay, CartesianRay;
 
 // External packages
-import progress.bar;
 import mir.random.engine;
 import mirRandom = mir.random.engine;
 import mir.random.ndvariable : sphereVar;
 import mir.random.variable : uniformVar;
+import progress.bar;
+import singlog : logger = log;
 
 void trace_rays(FluidBlock block, number absorptionCoefficient) {
     auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
@@ -195,10 +196,49 @@ void trace_intensity(FluidBlock block, number absorptionCoefficient) {
             progressBar.next();
         }
 
-        origin.fs.Qrad = -absorptionCoefficient * (4*PI * origin.grey_blackbody_intensity() - incidentRadiation);
+        origin.fs.Qrad = -absorptionCoefficient * (4 * PI * origin.grey_blackbody_intensity() - incidentRadiation);
     }
 
     progressBar.finish();
+}
+
+bool cross_cell(FluidFVCell cell, Ray ray, out size_t iface_id, out number step_length) {
+    // Placeholder for if we need to do moving grids
+    size_t gtl = 0;
+
+    Vector3 vertex_i;
+    Vector3 vertex_j;
+
+    debug {
+        logger.debugging(format("Coords %s", cell.vtx.map!(v => v.pos[gtl])));
+    }
+
+    foreach (n, iface; cell.iface) {
+        vertex_i = iface.vtx[0].pos[gtl];
+        vertex_j = iface.vtx[1].pos[gtl];
+        // Need to ensure the interface is moving anti-clockwise with
+        // respect to the cell interior
+        if (cell.outsign[n] == -1) {
+            swap(vertex_i, vertex_j);
+        }
+
+        bool success = ray.intersect(vertex_i, vertex_j, step_length);
+        debug {
+            logger.debugging(format(
+                    "Checking vertex pair (%s, %s), got length %s",
+                    vertex_i, vertex_j, step_length
+            ));
+        }
+        if (success) {
+            iface_id = n;
+            return true;
+        }
+    }
+
+    debug {
+        logger.error(format("Failed at cell %s", cell.id));
+    }
+    return false;
 }
 
 FVInterface marching_efficient(size_t cellID, FluidBlock block,
@@ -208,17 +248,12 @@ FVInterface marching_efficient(size_t cellID, FluidBlock block,
 
     FluidFVCell currentCell = block.cells[cellID];
     Vector3 rayCoord = currentCell.pos[gtl];
-    Grid currentGrid = get_grid(block);
     bool isWithinBlock = true;
 
     // Working variables
     FVInterface outgoing;
-    Vector3 vertex_i;
-    Vector3 vertex_j;
 
     rayTangent.normalize();
-
-    // writeln(format("[INFO]  Tracing ray from %s in direction %s", rayCoord, rayTangent));
 
     Ray ray;
     if (axisymmetric) {
@@ -227,96 +262,27 @@ FVInterface marching_efficient(size_t cellID, FluidBlock block,
         ray = new CartesianRay(rayTangent, rayCoord);
     }
 
-    // writeln(format("[DEBUG] Cell volume: %.3f", currentCell.volume[gtl]));
-    // writeln(format("[INFO ] Starting at %s, in direction %s", rayCoord, rayTangent));
-    // writeln(format("[INFO ] Ray description: %s", ray));
-
+    // What other terminating conditions might we want?
     while (isWithinBlock) {
-    ndim:
-        switch (currentGrid.dimensions) {
-        case 1:
-            throw new Exception("cell search not implemented for 1D grids");
-        case 2:
-            size_t iface_id;
-            number step_length;
+        size_t iface_id;
+        number step_length;
 
-        faces: foreach (n, iface; currentCell.iface) {
-                vertex_i = iface.vtx[0].pos[gtl];
-                vertex_j = iface.vtx[1].pos[gtl];
-                // Need to ensure the interface is moving anti-clockwise with
-                // respect to the cell interior
-                if (currentCell.outsign[n] == -1) {
-                    swap(vertex_i, vertex_j);
-                }
+        bool success = cross_cell(currentCell, ray, iface_id, step_length);
 
-                bool success = ray.intersect(vertex_i, vertex_j, step_length);
-                if (success) {
-                    iface_id = n;
-                    break faces;
-                }
-            }
+        ray.walkForward(step_length);
+        outgoing = currentCell.iface[iface_id];
 
-            debug {
-                if (step_length.isNaN()) {
-                    //                 writeln(format("[TRACE] Failed at cell %s", currentCell.id));
-                    //                 writeln(format("[TRACE] Coords [%s, %s, %s, %s]", currentCell.vtx[0].pos, currentCell.vtx[1].pos, currentCell.vtx[2].pos, currentCell.vtx[3].pos));
-                    auto hyper_ray = cast(HyperbolicRay) ray;
-                    if (hyper_ray) {
-                        //                     writeln(format("[TRACE] Failed with ray: \n\tdirection: %s", hyper_ray.localTangent(hyper_ray.linearCoord)));
-                        //                     writeln(format("[TRACE] \tcoord: %s\n\ttangent: %s", rayCoord, rayTangent));
-                    }
+        lengths ~= step_length;
+        crossed ~= currentCell.id;
 
-                    // Re-run this, and print debug values
-                    foreach (n, iface; currentCell.iface) {
-                        vertex_i = iface.vtx[0].pos[gtl];
-                        vertex_j = iface.vtx[1].pos[gtl];
-                        // Need to ensure the interface is moving anti-clockwise with
-                        // respect to the cell interior
-                        if (currentCell.outsign[n] == -1) {
-                            swap(vertex_i, vertex_j);
-                        }
+        // WARN: The `currentCell` can be null if crossing a boundary
+        //       with no ghost cell on the other side
+        currentCell = (currentCell.outsign[iface_id] == +1) ? outgoing.right_cell : outgoing.left_cell;
 
-                        bool _ = ray.intersect(vertex_i, vertex_j, step_length);
-                        //                     writeln(format("[TRACE] Checking vertex pair (%s, %s), got length %s", vertex_i, vertex_j, step_length));
-                    }
+        if (outgoing.is_on_boundary) {
+            isWithinBlock = false;
+        }
 
-                    throw new Exception("Something bad has happened...");
-                    isWithinBlock = false;
-                    break;
-                }
-            }
-
-            ray.walkForward(step_length);
-            outgoing = currentCell.iface[iface_id];
-
-            lengths ~= step_length;
-            crossed ~= currentCell.id;
-
-            // debug {
-            //     if ((crossed.length >= 4) && (crossed[$-1] == crossed[$-3]) && (crossed[$-2] == crossed[$-4])) {
-            //         throw new Exception("Loop found within ray-tracing, exiting.");
-            //     }
-            // }
-
-            // WARN: The `currentCell` can be null if crossing a boundary
-            //       with no ghost cell on the other side
-            currentCell = (currentCell.outsign[iface_id] == +1) ? outgoing.right_cell : outgoing.left_cell;
-
-            // debug {
-            //     writeln("Stepping ", step_length, " in direction ", rayTangent);
-            //     writeln("Stepping across ", outgoing.id," to cell ", currentCell.id);
-            // }
-
-            if (outgoing.is_on_boundary) {
-                isWithinBlock = false;
-            }
-
-            break ndim;
-        case 3:
-            throw new Exception("cell search not implemented for 3D grids");
-        default:
-            throw new Exception("invalid number of dimensions");
-        } // end switch (dimensions)
     }
 
     return outgoing;
