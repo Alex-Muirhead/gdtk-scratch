@@ -25,7 +25,7 @@ import lmr.init;
 import lmr.sfluidblock;
 import lmr.ufluidblock;
 
-import raytracing;
+import radiation.raytrace.raytracing;
 
 void main(string[] args) {
 
@@ -90,7 +90,7 @@ void main(string[] args) {
     uint direction = opposite_face(wallSide);
     BoundaryCondition capsuleWall = block.bc[wallSide];
 
-    trace_intensity(block, absorptionCoefficient);
+    trace_rays(block, absorptionCoefficient);
 
     foreach (blk; localFluidBlocks) {
         auto fileName = fluidFilename(nWrittenSnapshots, blk.id);

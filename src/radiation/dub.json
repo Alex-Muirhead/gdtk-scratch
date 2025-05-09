@@ -4,21 +4,21 @@
 	],
 	"configurations": [
 		{
-			"mainSourceFile": "source/raytracing_app.d",
+			"mainSourceFile": "source/radiation/raytracing_app.d",
 			"name": "raytrace",
 			"targetName": "lmr-raytrace",
 			"targetPath": "$INSTALL_DIR/bin",
 			"targetType": "executable"
 		},
 		{
-			"mainSourceFile": "source/tangentslab_app.d",
+			"mainSourceFile": "source/radiation/tangentslab_app.d",
 			"name": "tangentslab",
 			"targetName": "lmr-tangentslab",
 			"targetPath": "$INSTALL_DIR/bin",
 			"targetType": "executable"
 		},
 		{
-			"mainSourceFile": "source/intensity_tracing.d",
+			"mainSourceFile": "source/radiation/intensity_tracing.d",
 			"name": "intensity",
 			"targetName": "lmr-intensity",
 			"targetPath": "$INSTALL_DIR/bin",
@@ -32,12 +32,6 @@
 			"name": "unittest",
 			"targetType": "library"
 		},
-		{
-			"mainSourceFile": "source/simple-grid.d",
-			"name": "simple-grid",
-			"targetName": "simple-grid",
-			"targetType": "executable"
-		}
 	],
 	"copyright": "Copyright © 2024, Alex Muirhead",
 	"dependencies": {
