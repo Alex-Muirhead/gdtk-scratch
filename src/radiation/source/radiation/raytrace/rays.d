@@ -52,7 +52,7 @@ public:
     bool intersect(Vector3 vertexOne, Vector3 vertexTwo, out number length) {
         // Calculate the face tangent vector
         // NOTE: Could potentially use iface.t1 for this?
-        //       Probably not, since we need a non-normalised vec 
+        //       Probably not, since we need a non-normalised vec
         Vector3 faceTangent = vertexTwo - vertexOne;
         Vector3 toVertex = this.currentPoint() - vertexOne;
 
@@ -129,12 +129,12 @@ public:
         return format("HyperbolicRay(a: %.2g, b: %.2g, f0: %s)", semiMajor, semiMinor, center);
     }
 
-    /** 
-     * Evaluate the tangent to the hyperbola. 
+    /**
+     * Evaluate the tangent to the hyperbola.
      *
      * Params:
      *   rayCoord = The rayCoord to evaluate the tangent at (number). This is s
-     * Returns: 
+     * Returns:
      */
     Vector3 localTangent(number rayCoord) {
         number normCoord = rayCoord / linearEccentricity; // This is s'

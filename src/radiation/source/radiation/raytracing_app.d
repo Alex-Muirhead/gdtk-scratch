@@ -25,6 +25,8 @@ import lmr.init;
 import lmr.sfluidblock;
 import lmr.ufluidblock;
 
+import singlog : logger = log;
+
 import radiation.raytrace.raytracing;
 
 void main(string[] args) {
@@ -43,6 +45,11 @@ void main(string[] args) {
         defaultGetoptPrinter("lmr-raytrace options.", helpInformation.options);
         return;
     }
+
+    logger.program("Ray Tracing")
+        .color(true)
+        // .level(logger.DEBUGGING)
+        .output(logger.output.std);
 
     writeln("Initial workings on a standalone radiation post-processing code.");
     writeln(format("Absorptivity: %.2g", absorptionCoefficient));
@@ -69,7 +76,7 @@ void main(string[] args) {
     initMappedCellDataExchange();
     initGhostCellGeometry();
 
-    writeln(format("Axisymmetric? %s", cfg.axisymmetric));
+    logger.information(format("Axisymmetric? %s", cfg.axisymmetric));
 
     // Set everything to zero initially
     // FIXME: This is because of some weird buffer thing in loading
