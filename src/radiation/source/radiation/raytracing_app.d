@@ -16,7 +16,6 @@ import lmr.bc.boundary_condition : BoundaryCondition;
 import lmr.bc.ghost_cell_effect.full_face_copy : GhostCellFullFaceCopy;
 import lmr.fileutil : ensure_directory_is_present;
 import lmr.fluidblock : FluidBlock;
-import lmr.fluidfvcell : FluidFVCell;
 import lmr.fvcell : FVCell;
 import lmr.fvinterface : FVInterface;
 import lmr.globalconfig;
@@ -27,18 +26,20 @@ import lmr.ufluidblock;
 
 import singlog : logger = log;
 
-import radiation.raytrace.raytracing;
+import radiation.ray.tracing;
 
 void main(string[] args) {
 
     // Default arg values
     string workingDir = ".";
     double absorptionCoefficient = 1.0;
+    bool modelEmission = false;
 
     auto helpInformation = getopt(
         args, std.getopt.config.stopOnFirstNonOption,
         "d|dir", &workingDir,
-        "k|absorptivity", &absorptionCoefficient
+        "k|absorptivity", &absorptionCoefficient,
+        "emission", &modelEmission
     );
 
     if (helpInformation.helpWanted) {
@@ -78,13 +79,15 @@ void main(string[] args) {
 
     logger.information(format("Axisymmetric? %s", cfg.axisymmetric));
 
-    // Set everything to zero initially
-    // FIXME: This is because of some weird buffer thing in loading
-    //        data during `lmr snapshot2vtk`, it takes the same
-    //        values from the previous variable (temperature here)
+    // Set initial value before tracing
+    // Can use the default emission for simplicity
     foreach (blk; localFluidBlocks) {
         foreach (cell; blk.cells) {
-            cell.fs.Qrad = 0.0;
+            if (modelEmission) {
+                cell.fs.Qrad = -4*PI* absorptionCoefficient * cell.grey_blackbody_intensity();
+            } else {
+                cell.fs.Qrad = 0.0;
+            }
         }
     }
 
@@ -92,11 +95,6 @@ void main(string[] args) {
     ensure_directory_is_present(dirName);
 
     FluidBlock block = localFluidBlocks[0];
-
-    uint wallSide = Face.east;
-    uint direction = opposite_face(wallSide);
-    BoundaryCondition capsuleWall = block.bc[wallSide];
-
     trace_rays(block, absorptionCoefficient);
 
     foreach (blk; localFluidBlocks) {

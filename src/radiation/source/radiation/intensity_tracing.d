@@ -25,7 +25,7 @@ import lmr.init;
 import lmr.sfluidblock;
 import lmr.ufluidblock;
 
-import radiation.raytrace.raytracing;
+import radiation.ray.tracing;
 
 void main(string[] args) {
 
