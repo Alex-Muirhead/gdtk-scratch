@@ -1,0 +1,119 @@
+// FIXME: The step size should probably be dependent on cell size...
+// NOTE: What do we want to return here?
+//       I'm thinking that we could return the FVInterface or BoundaryCondition
+//       that the ray hits, and then make a decision after that.
+//       This allows us to deal with different conditions (i.e. periodic boundaries, etc)
+//       and also work out what the next block is to restart the routine.
+
+/** March across a block from the given cell in desired direction.
+ * This **full** implementation takes many small steps across the domain
+ *
+ * Params:
+ *   cellID = The ID of the starting cell (must be within the block)
+ *   block = The block to march the ray across
+ *   direction = The direction of the ray as a Vector3
+ *   crossed = Which cells within the block the ray crosses
+ *   lengths = What distance across each respective cell the ray marched
+ * Returns:
+ *   The interface which was intersected
+ */
+FVInterface marching_full(size_t cellID, FluidBlock block, Vector3 rayTangent,
+    bool axisymmetric, ref size_t[] crossed, ref number[] lengths) {
+    // Placeholder for if we need to do moving grids
+    size_t gtl = 0;
+
+    bool isWithinBlock = true;
+    bool isContained;
+    FluidFVCell currentCell = block.cells[cellID];
+    Vector3 rayCoord = currentCell.pos[0]; // INFO: Grid is stationary, index is time
+    Grid currentGrid = get_grid(block);
+
+    // Ray ray;
+    // if (axisymmetric) {
+    //     ray = new HyperbolicRay(rayTangent, rayCoord);
+    // }
+    // else {
+    //     ray = new CartesianRay(rayTangent, rayCoord);
+    // }
+
+    auto hRay = new HyperbolicRay(rayTangent, rayCoord);
+    auto cRay = new CartesianRay(rayTangent, rayCoord);
+
+    number stepSize = 1E-03; // FIXME: This should be proportional to something...
+    int consecutiveSteps = 1;
+    FVInterface hit;
+
+    // NOTE: Do we want to record the first step?
+
+    marchLoop: while (isWithinBlock) {
+        hRay.walkForward(stepSize);
+        cRay.walkForward(stepSize);
+        Vector3 hRayCoord = hRay.currentPoint();
+        Vector3 cRayCoord = cRay.currentPoint();
+        rayCoord = Vector3(cRayCoord.x, sqrt(cRayCoord.y ^^ 2 + cRayCoord.z ^^ 2));
+        assert((fabs(hRayCoord.x - rayCoord.x) < 1e-6) && (fabs(hRayCoord.y - rayCoord.y) < 1e-6)
+                && (fabs(hRayCoord.z - rayCoord.z) < 1e-6),
+            format("Rays are not equal. %s != %s", hRayCoord, rayCoord));
+        rayCoord = hRayCoord;
+        isContained = currentGrid.point_is_inside_cell(rayCoord, currentCell.id);
+
+        // Keep walking while within the same cell
+        if (isContained) {
+            consecutiveSteps++;
+            continue;
+        }
+
+        // Record current steps
+        crossed ~= currentCell.id;
+        lengths ~= stepSize * consecutiveSteps;
+        consecutiveSteps = 1;
+
+        debug {
+            if ((crossed.length >= 4) && (crossed[$ - 1] == crossed[$ - 3])
+                && (crossed[$ - 2] == crossed[$ - 4])) {
+                throw new Exception("Loop found within ray-tracing, exiting.");
+            }
+        }
+
+        Vector3 vertex_i, vertex_j;
+
+        // NOTE: Could shortcut by checking the boundaries directly from the cell
+        //       vertices, rather than bringing all neighbours into memory
+        faces: foreach (n, iface; currentCell.iface) {
+            vertex_i = iface.vtx[0].pos[gtl];
+            vertex_j = iface.vtx[1].pos[gtl];
+            // Need to ensure the interface is moving anti-clockwise with
+            // respect to the cell interior
+            if (currentCell.outsign[n] == -1) {
+                swap(vertex_i, vertex_j);
+            }
+
+            if (on_left_of_xy_line(vertex_i, vertex_j, rayCoord)) {
+                // We haven't cross this interface (I think...)
+                continue faces;
+            }
+
+            // So we have crossed this interface ...
+            auto neighbour = currentCell.cell_cloud[n + 1];
+
+            // Check if it's a ghost
+            if (neighbour.is_ghost) {
+                hit = iface;
+                break marchLoop;
+            }  // Check that we're inside it
+            else {
+                isContained = currentGrid.point_is_inside_cell(rayCoord, neighbour.id);
+                if (isContained) {
+                    currentCell = neighbour;
+                    continue marchLoop;
+                }
+            }
+        }
+
+        if (!isContained) {
+            // We haven't found the neighbour
+            break marchLoop;
+        }
+    }
+    return hit;
+}
