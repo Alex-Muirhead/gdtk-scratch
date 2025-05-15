@@ -1,4 +1,4 @@
-module rays;
+module radiation.ray.types;
 
 import std.format;
 import std.math;
@@ -275,4 +275,18 @@ unittest {
     // Flip the edge order, and the cross should prevent a solution
     success = ray.intersect(vertex1, vertex0, arcLength);
     Assert.equal(success, false);
+}
+
+@("Hyperbolic Construction - Normal to axis")
+unittest {
+    import fluent.asserts;
+    import std.stdio;
+
+    // tangent || x gives NaN values
+    // tangent +  x gives DIV_BY_ZERO values
+    Vector3 tangent = Vector3(1.0, 0.0, 0.0); // y is normal to x
+    Vector3 terminus = Vector3(0.0, 0.0, 0.0);
+
+    Ray ray = new HyperbolicRay(tangent, terminus);
+    writeln(ray);
 }
