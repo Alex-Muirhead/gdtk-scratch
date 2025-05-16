@@ -27,7 +27,7 @@ import lmr.ufluidblock : UFluidBlock;
 
 alias cfg = GlobalConfig;
 
-import radiation.ray.types : Ray, HyperbolicRay, CartesianRay;
+import radiation.ray.types : Ray, HyperbolicRay, PlanarRay;
 
 // External packages
 import mir.random.engine;
@@ -228,7 +228,7 @@ FVInterface marching_efficient(
     if (axisymmetric) {
         ray = new HyperbolicRay(rayTangent, rayCoord);
     } else {
-        ray = new CartesianRay(rayTangent, rayCoord);
+        ray = new PlanarRay(rayTangent, rayCoord);
     }
 
     FVInterface outgoing;
