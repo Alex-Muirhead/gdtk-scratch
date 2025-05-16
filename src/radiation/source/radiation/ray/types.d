@@ -12,7 +12,7 @@ interface Ray {
     Vector3 currentPoint();
 }
 
-class CartesianRay : Ray {
+class PlanarRay : Ray {
 public:
     Vector3 terminus;
     Vector3 tangent;
@@ -22,6 +22,9 @@ public:
         this.tangent = tangent;
         this.terminus = terminus;
         this.rayCoord = 0.0;
+        // Project tangent onto XY plane
+        // NOTE: Do NOT renormalize, so we can recover proper distance travelled.
+        this.tangent.z = 0.0;
     }
 
     /**
@@ -60,10 +63,6 @@ public:
         number s = wedge2D(toVertex, faceTangent) / alignment;
         number t = wedge2D(toVertex, tangent) / alignment;
 
-        debug {
-            //         writeln(format("[TRACE] t = %.5f, s = %.5f, alignment = %.2f", t, s, alignment));
-        }
-
         // There should only be a single solution if the cell is convex
         if (t >= 0 && t < 1 && s > 1E5 * number.epsilon) {
             length = s;
@@ -73,6 +72,71 @@ public:
         return false;
     }
 }
+
+@("Planar Ray - True 2D Distance")
+unittest {
+    import fluent.asserts;
+
+    Vector3 terminus = Vector3(x: 0.0, y: 0.0);
+    Vector3 tangent = Vector3(x: 1.0, y: 1.0, z: 0.0);
+    tangent.normalize();
+
+    Ray ray = new PlanarRay(tangent, terminus);
+
+    // Construct the line segment, East->North
+    Vector3 vertex_i = Vector3(x: 1.0, y: 0.0);
+    Vector3 vertex_j = Vector3(x: 0.0, y: 1.0);
+
+    number distance;
+    bool success = ray.intersect(vertex_i, vertex_j, distance);
+
+    Assert.equal(success, true);
+    Assert.approximately(distance, sqrt(2.0)/2.0, 1e-6);
+}
+
+@("Planar Ray - Diagonal Projected Distance")
+unittest {
+    import fluent.asserts;
+
+    Vector3 terminus = Vector3(x: 0.0, y: 0.0);
+    Vector3 tangent = Vector3(x: 1.0, y: 0.0, z: 1.0); // Into the page
+    tangent.normalize();
+
+    Ray ray = new PlanarRay(tangent, terminus);
+
+    // Construct the line segment, South->North
+    Vector3 vertex_i = Vector3(x: 1.0, y: 0.0);
+    Vector3 vertex_j = Vector3(x: 1.0, y: 1.0);
+
+    number distance;
+    bool success = ray.intersect(vertex_i, vertex_j, distance);
+
+    Assert.equal(success, true);
+    Assert.approximately(distance, sqrt(2.0), 1e-6);
+}
+
+@("Planar Ray - Slightly Askew Projected Distance")
+unittest {
+    import fluent.asserts;
+    import std.stdio;
+
+    Vector3 terminus = Vector3(x: 0.0, y: 0.0);
+    Vector3 tangent = Vector3(x: 1.0, y: 0.0, z: 0.01); // Into the page
+    tangent.normalize();
+
+    Ray ray = new PlanarRay(tangent, terminus);
+
+    // Construct the line segment, South->North
+    Vector3 vertex_i = Vector3(x: 1.0, y: 0.0);
+    Vector3 vertex_j = Vector3(x: 1.0, y: 1.0);
+
+    number distance;
+    bool success = ray.intersect(vertex_i, vertex_j, distance);
+
+    Assert.equal(success, true);
+    Assert.greaterThan(distance, 1.0);
+}
+
 
 class HyperbolicRay : Ray {
 public:
