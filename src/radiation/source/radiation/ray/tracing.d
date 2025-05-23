@@ -41,7 +41,7 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
     auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
     // auto rne = mirRandom.Random(4);
     auto rne = mirRandom.Random(mirRandom.unpredictableSeed());
-    uint angleSamples = 1_000;
+    uint angleSamples = 10_000;
     auto angleGenerator = uniformVar!number(0.0, 2 * PI);
     // NOTE: Using angleSamples of 1000 causes NaN values. Weird??
 
@@ -174,7 +174,16 @@ void trace_intensity(FluidBlock block, number absorptionCoefficient) {
     progressBar.finish();
 }
 
-bool cross_cell(FluidFVCell cell, Ray ray, out size_t iface_id, out number step_length) {
+struct Crossing {
+    size_t iface_id;
+    number distance;
+}
+
+void trace_block(FluidBlock block, FluidFVCell starting_cell, Ray ray) {
+
+}
+
+bool trace_cell(FluidFVCell cell, Ray ray, out size_t iface_id, out number step_length) {
     // Placeholder for if we need to do moving grids
     size_t gtl = 0;
 
@@ -238,14 +247,14 @@ FVInterface marching_efficient(
         size_t iface_id;
         number step_length;
 
-        bool success = cross_cell(currentCell, ray, iface_id, step_length);
+        bool success = trace_cell(currentCell, ray, iface_id, step_length);
         debug {
             // Re-run if necessary
             if (!success) {
                 logger.level(logger.DEBUGGING);
                 logger.error(format("Failed at cell %s. Re-running with verbosity.", currentCell.id));
                 logger.debugging(format("Ray: %s", ray));
-                auto _ = cross_cell(currentCell, ray, iface_id, step_length);
+                auto _ = trace_cell(currentCell, ray, iface_id, step_length);
                 logger.level(logger.ERROR);
             }
         }

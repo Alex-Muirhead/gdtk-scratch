@@ -116,6 +116,7 @@ string[] buildFluidVariables()
     }
     if (cfg.with_local_time_stepping) variables ~= "dt_local";
     variables ~= "Qrad";
+    variables ~= "Qrad_var";
     return variables;
 } // end buildFluidVariables()
 
@@ -249,6 +250,7 @@ public:
 	    case "e": return fcell.fs.gas.u.re;
 	    case "T": return fcell.fs.gas.T.re;
 	    case "Qrad": return fcell.fs.Qrad.re;
+	    case "Qrad_var": return fcell.fs.Qrad_var.re;
 	    default:
 	        throw new LmrException("Invalid selection for cell variable: " ~ var);
 	    }
@@ -306,6 +308,7 @@ public:
         case "e": fcell.fs.gas.u.re = value; return fcell.fs.gas.u.re;
         case "T": fcell.fs.gas.T.re = value; return fcell.fs.gas.T.re;
         case "Qrad": fcell.fs.Qrad.re = value; return fcell.fs.Qrad.re;
+        case "Qrad_var": fcell.fs.Qrad_var.re = value; return fcell.fs.Qrad_var.re;
         default:
             throw new LmrException("Invalid selection for cell variable: " ~ var);
         }

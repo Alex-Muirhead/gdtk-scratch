@@ -6,6 +6,29 @@ import std.math;
 import geom.elements.vector3 : Vector3, wedge2D, dot;
 import nm.number : number;
 
+// enum CrossingDir {
+//     NONE = 0, // 0b00
+//     IN = 1, // 0b01
+//     OUT = 2, // 0b10
+//     BOTH = 3, // 0b11
+// }
+
+// struct Crossing {
+//     CrossingDir tag;
+//     number in_;
+//     number out_;
+// }
+
+// struct Ray_ {
+//     Vector3 terminus;
+//     Vector3 tangent;
+// }
+
+// struct LineSegment {
+//     Vector3 start;
+//     Vector3 finish;
+// }
+
 interface Ray {
     void walkForward(number length);
     bool intersect(Vector3 vertexOne, Vector3 vertexTwo, out number length);
@@ -91,7 +114,7 @@ unittest {
     bool success = ray.intersect(vertex_i, vertex_j, distance);
 
     Assert.equal(success, true);
-    Assert.approximately(distance, sqrt(2.0)/2.0, 1e-6);
+    Assert.approximately(distance, sqrt(2.0) / 2.0, 1e-6);
 }
 
 @("Planar Ray - Diagonal Projected Distance")
@@ -136,7 +159,6 @@ unittest {
     Assert.equal(success, true);
     Assert.greaterThan(distance, 1.0);
 }
-
 
 class HyperbolicRay : Ray {
 public:
@@ -255,30 +277,28 @@ public:
         // Throw away one of them entirely
         // ...but there might be two solutions still if sqrt(determinant) < findAName
         foreach (sign; [+1, -1]) {
-            {
-                // Calculate the exponential, arc, Cartesian, and linear coordinates at the intercept
-                number expHypAngle = positiveBeta * (1 + sign * bias);
-                if (expHypAngle < 0) {
-                    continue;
-                }
+            // Calculate the exponential, arc, Cartesian, and linear coordinates at the intercept
+            number expHypAngle = positiveBeta * (1 + sign * bias);
+            if (expHypAngle < 0) {
+                continue;
+            }
 
-                number interceptCoord = (expHypAngle ^^ 2 - 1) / (2 * expHypAngle) * linearEccentricity;
-                number crossingDirection = wedge2D(localTangent(interceptCoord), faceTangent);
-                if (crossingDirection < 0) {
-                    continue;
-                }
+            number interceptCoord = (expHypAngle ^^ 2 - 1) / (2 * expHypAngle) * linearEccentricity;
+            number crossingDirection = wedge2D(localTangent(interceptCoord), faceTangent);
+            if (crossingDirection < 0) {
+                continue;
+            }
 
-                Vector3 cartesian = center + positiveAsymptote * (expHypAngle / 2) + negativeAsymptote / (
-                    expHypAngle * 2);
-                Vector3 translation = cartesian - vertexOne;
-                number linear = dot(translation, faceTangent) / dot(faceTangent, faceTangent);
+            Vector3 cartesian = center + positiveAsymptote * (expHypAngle / 2) + negativeAsymptote / (
+                expHypAngle * 2);
+            Vector3 translation = cartesian - vertexOne;
+            number linear = dot(translation, faceTangent) / dot(faceTangent, faceTangent);
 
-                // Check if the intersection point is within the line segment
-                // and ahead of the current ray position
-                if (linear >= 0 && linear < 1 && interceptCoord > rayCoord) {
-                    length = interceptCoord - rayCoord;
-                    return true;
-                }
+            // Check if the intersection point is within the line segment
+            // and ahead of the current ray position
+            if (linear >= 0 && linear < 1 && interceptCoord > rayCoord) {
+                length = interceptCoord - rayCoord;
+                return true;
             }
         }
 
