@@ -119,6 +119,7 @@ string[] buildFluidVariables()
         variables ~= "sigma";
     }
     variables ~= "Qrad";
+    variables ~= "Qrad_var";
     return variables;
 } // end buildFluidVariables()
 
@@ -253,9 +254,10 @@ public:
         case "T": return fcell.fs.gas.T.re;
         case "sigma": return fcell.fs.gas.sigma.re;
 	    case "Qrad": return fcell.fs.Qrad.re;
-        default:
-            throw new LmrException("Invalid selection for cell variable: " ~ var);
-        }
+	    case "Qrad_var": return fcell.fs.Qrad_var.re;
+	    default:
+	        throw new LmrException("Invalid selection for cell variable: " ~ var);
+	    }
     } // end opIndex()
 
     override
@@ -311,6 +313,7 @@ public:
         case "T": fcell.fs.gas.T.re = value; return fcell.fs.gas.T.re;
         case "sigma": fcell.fs.gas.sigma.re = value; return fcell.fs.gas.sigma.re;
         case "Qrad": fcell.fs.Qrad.re = value; return fcell.fs.Qrad.re;
+        case "Qrad_var": fcell.fs.Qrad_var.re = value; return fcell.fs.Qrad_var.re;
         default:
             throw new LmrException("Invalid selection for cell variable: " ~ var);
         }

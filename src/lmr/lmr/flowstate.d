@@ -64,6 +64,7 @@ public:
     number k_t;        // turbulence thermal-conductivity
     number S;          // shock indicator
     number Qrad;       // radiative heat-flux
+    number Qrad_var;       // radiative heat-flux
 
     @disable this();
 
@@ -78,7 +79,10 @@ public:
          in Vector3 B_init=Vector3(0.0,0.0,0.0),
          in double psi_init=0.0, in double divB_init=1.0,
          in double mu_t_init=0.0, in double k_t_init=0.0,
-         in double S_init=0.0, in double Qrad_init=0.0)
+         in double S_init=0.0,
+         in double Qrad_init=0.0,
+         in double Qrad_var_init=0.0,
+         )
     {
         gas = GasState(gm, p_init, T_init, T_modes_init, massf_init, quality_init);
         vel = vel_init;
@@ -94,6 +98,7 @@ public:
         k_t = k_t_init;
         S = S_init;
         Qrad = Qrad_init;
+        Qrad_var = Qrad_var_init;
     }
 
     this(in FlowState other, GasModel gm)
@@ -113,6 +118,7 @@ public:
         k_t = other.k_t;
         S = other.S;
         Qrad = other.Qrad;
+        Qrad_var = other.Qrad_var;
     }
 
     this(in FlowState other)
@@ -131,6 +137,7 @@ public:
         k_t = other.k_t;
         S = other.S;
         Qrad = other.Qrad;
+        Qrad_var = other.Qrad_var;
     }
 
     this(GasModel gm, size_t nturb)
@@ -149,6 +156,7 @@ public:
         k_t = 0.0;
         S = 0.0;
         Qrad = 0.0;
+        Qrad_var = 0.0;
     }
 
     this(in JSONValue json_data, GasModel gm)
@@ -187,6 +195,7 @@ public:
         k_t = getJSONdouble(json_data, "k_t", 0.0);
         S = getJSONdouble(json_data, "S", 0.0);
         Qrad = getJSONdouble(json_data, "Qrad", 0.0);
+        Qrad_var = getJSONdouble(json_data, "Qrad_var", 0.0);
     }
 
     FlowState dup() const
@@ -213,6 +222,7 @@ public:
         k_t = other.k_t;
         S = other.S;
         Qrad = other.Qrad;
+        Qrad_var = other.Qrad_var;
     }
 
     @nogc
@@ -322,6 +332,7 @@ public:
         repr ~= ", k_t=" ~ to!string(k_t);
         repr ~= ", S=" ~ to!string(S);
         repr ~= ", Qrad=" ~ to!string(Qrad);
+        repr ~= ", Qrad_var=" ~ to!string(Qrad_var);
         repr ~= ")";
         return to!string(repr);
     }
