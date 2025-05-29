@@ -15,10 +15,8 @@ import mir.random.variable : uniformVar;
 
 class Stochastic {
 public:
-    int dimensions;
 
-    this(int dimensions) {
-        this.dimensions = dimensions;
+    this() {
     }
 }
 
@@ -29,12 +27,10 @@ private:
     int i;
     int N;
 public:
-    uint dimensions;
     uint samples;
 
-    this(uint dimensions, uint samples) {
+    this(uint samples) {
         assert(samples % 2 == 1, "Number of samples must be odd.");
-        this.dimensions = dimensions;
         this.samples = samples;
         this.N = (samples - 1) / 2;
         this.i = -N;
@@ -69,7 +65,7 @@ unittest {
     import fluent.asserts;
     import std.stdio;
 
-    auto samples = new Deterministic(3, 1);
+    auto samples = new Deterministic(1);
     Vector3 direction = samples.front();
 
     Assert.equal(direction.z, 0.0);
@@ -85,7 +81,7 @@ unittest {
     import std.array;
     import std.stdio;
 
-    auto samples = new Deterministic(3, 5);
+    auto samples = new Deterministic(5);
 
     Vector3[] directions = array(samples);
     Assert.equal(directions.length, 5);
