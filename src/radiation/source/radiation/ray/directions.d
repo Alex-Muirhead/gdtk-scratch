@@ -46,10 +46,11 @@ public:
     }
 
     Vector3 front() const {
-        number lon = 2*PI*i / PHI + OFFSET; // Add offset to avoid collision with YZ-plane
-        number z = 2.0*i / samples; // lat = arcsin(z);
-        number comp = sqrt(1 - z*z);
-        return Vector3(x: comp*sin(lon), y: comp*cos(lon), z: z);
+        number lon = 2*PI*i / PHI + OFFSET;
+        number x = 2.0*i / samples; // lat = arcsin(z);
+        number comp = sqrt(1 - x*x);
+        // Choose z <- cos, such that i=0 gives z=1
+        return Vector3(x: x, y: comp*sin(lon), z: comp*cos(lon));
     }
 }
 
@@ -68,8 +69,8 @@ unittest {
     auto samples = new Deterministic(1);
     Vector3 direction = samples.front();
 
-    Assert.equal(direction.z, 0.0);
-    Assert.equal(direction.x, direction.y);
+    Assert.equal(direction.x, 0.0);
+    Assert.equal(direction.z, 1.0);
 
     samples.popFront();
     Assert.equal(samples.empty(), true);

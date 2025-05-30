@@ -367,10 +367,17 @@ unittest {
     import std.stdio;
 
     // tangent || x gives NaN values
-    // tangent +  x gives DIV_BY_ZERO values
-    Vector3 tangent = Vector3(1.0, 0.0, 0.0); // y is normal to x
-    Vector3 terminus = Vector3(0.0, 0.0, 0.0);
+    // tangent.z == 0 (in the projection plane) gives DIV_BY_ZERO values
+    Vector3 tangent = Vector3(0.0, 0.0, 1.0); // y is normal to x
+    Vector3 terminus = Vector3(0.0, 1.0, 0.0);
 
     Ray ray = new HyperbolicRay(tangent, terminus);
-    writeln(ray);
+
+    // Define edge vertices (right-to-left to get crossing-dir)
+    Vector3 vertex0 = Vector3(+0.5, 2.0);
+    Vector3 vertex1 = Vector3(-0.5, 2.0);
+
+    number length;
+    bool success = ray.intersect(vertex0, vertex1, length);
+    Assert.equal(success, true);
 }
