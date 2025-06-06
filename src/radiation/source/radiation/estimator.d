@@ -1,5 +1,7 @@
 module radiation.estimator;
 
+import std.math;
+
 import nm.number;
 import geom.elements.vector3 : Vector3, wedge2D, dot;
 
@@ -28,18 +30,28 @@ struct SimpleEstimator(T) {
     }
 
     @property
-    size_t count() {
+    size_t sample_count() {
         return zeroth;
     }
 
     @property
-    T mean() {
+    T sample_mean() {
         return first / zeroth;
     }
 
     @property
-    T var() {
+    T sample_var() {
         return second / zeroth - (first / zeroth) ^^ 2;
+    }
+
+    @property
+    T value() {
+        return sample_mean();
+    }
+
+    @property
+    T stddev() {
+        return sqrt(sample_var() / sample_count());
     }
 }
 
@@ -54,9 +66,9 @@ unittest {
 
     Assert.equal(updated.first, 6.0);
 
-    Assert.equal(updated.count, 2);
-    Assert.equal(updated.mean, 3.0);
-    Assert.equal(updated.var, 1.0);
+    Assert.equal(updated.sample_count, 2);
+    Assert.equal(updated.sample_mean, 3.0);
+    Assert.equal(updated.sample_var, 1.0);
 }
 
 struct Location {

@@ -1,4 +1,4 @@
-module radiation.ray.types;
+module radiation.ray.projections;
 
 import std.format;
 import std.math;
