@@ -27,7 +27,9 @@ import lmr.ufluidblock : UFluidBlock;
 
 alias cfg = GlobalConfig;
 
-import radiation.ray.types : Ray, HyperbolicRay, PlanarRay;
+import radiation.ray.projections : Ray, HyperbolicRay, PlanarRay;
+import radiation.ray.directions: Deterministic;
+import radiation.estimator : SimpleEstimator;
 
 // External packages
 import mir.random.engine;
@@ -41,8 +43,7 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
     auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
     // auto rne = mirRandom.Random(4);
     auto rne = mirRandom.Random(mirRandom.unpredictableSeed());
-    uint angleSamples = 10_000;
-    auto angleGenerator = uniformVar!number(0.0, 2 * PI);
+    uint angleSamples = 10_001;
     // NOTE: Using angleSamples of 1000 causes NaN values. Weird??
 
     number energyLost = 0.0;
@@ -54,28 +55,21 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
     progressBar.suffix = { return format("%6.2f%%\n", progressBar.percent); };
     progressBar.max = angleSamples * block.cells.length;
 
+    SimpleEstimator!(number)[] Qrad;
+    Qrad.length = block.cells.length;
+    // Initialise properly (we should do this inside the struct def)
+    foreach (i, ref c; Qrad) {
+        c = SimpleEstimator!number(0, 0.0, 0.0);
+    }
+
     foreach (cell_id, ref origin; block.cells) {
 
         number fullEmissionEnergy = 4 * PI * origin.volume[0]
             * absorptionCoefficient * origin.grey_blackbody_intensity();
         // writeln(format("[INFO ] Cell ID: %d,\t Energy: %.3g", cell_id, fullEmissionEnergy));
 
-        number selfAbsorbed = 0.0;
-
-        foreach (a; 0 .. angleSamples) {
-            number[3] angleVector;
-            sphereVar()(rne, angleVector); // TODO: Check if this is _true_ SO3
-
-            // number angle = angleGenerator(rne);
-            // number angle = (double(a) / double(angleSamples) + 1E-6) * 2 * PI;
-
-            // Vector3 direction = Vector3([angleVector[0], angleVector[1], 0]);
-            Vector3 direction = Vector3([angleVector[0], angleVector[1], angleVector[2]]);
-            // Vector3 direction = Vector3([0.0, cos(angle), sin(angle)]);
-
-            // number mu = sqrt(1 - angleVector[2] ^^ 2);
-            number mu = 1;
-
+        auto directions = new Deterministic(angleSamples);
+        foreach (direction; directions) {
             number rayEnergy = fullEmissionEnergy / angleSamples;
 
             energyEmitted += rayEnergy;
@@ -89,24 +83,19 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
             inner: foreach (i; 0 .. rayCells.length) {
                 number cellVolume = block.cells[rayCells[i]].volume[0];
                 // Kill off the ray if it's too weak
-                if (rayEnergy / initialEnergy < 1E-16) {
-                    block.cells[rayCells[i]].fs.Qrad += rayEnergy / cellVolume;
+                if (rayEnergy / initialEnergy < 1E-6) {
+                    Qrad[rayCells[i]] += rayEnergy / cellVolume;
                     energyAbsorbed += rayEnergy;
                     rayEnergy = 0.0;
                     break inner;
                 }
 
-                number opticalThickness = absorptionCoefficient * rayLengths[i] / mu;
+                number opticalThickness = absorptionCoefficient * rayLengths[i];
                 number heating = rayEnergy * (1 - exp(-opticalThickness));
-                if (rayCells[i] == cell_id) {
-                    selfAbsorbed += heating;
-                }
                 energyAbsorbed += heating;
                 rayEnergy *= exp(-opticalThickness);
-                block.cells[rayCells[i]].fs.Qrad += heating / cellVolume;
+                Qrad[rayCells[i]] += heating / cellVolume;
             }
-
-            // writeln(format("Interface hit: %s", block.bc[inter.bc_id]));
 
             energyLost += rayEnergy;
 
@@ -115,6 +104,12 @@ void trace_rays(FluidBlock block, number absorptionCoefficient) {
     }
 
     progressBar.finish();
+
+    // Write back into the block
+    foreach (i, ref c; Qrad) {
+        block.cells[i].fs.Qrad += c.first;
+        block.cells[i].fs.Qrad_var = sqrt(c.sample_var() * c.zeroth);
+    }
 
     writeln(format("Energy emitted: %.3g", energyEmitted));
     writeln(format("Energy absorbed: %.3g", energyAbsorbed));
@@ -126,52 +121,60 @@ void trace_intensity(FluidBlock block, number absorptionCoefficient) {
     // auto rng = Random(4); // Chosen by fair dice roll guaranteed to be random (xkcd.com/221)
     // auto rne = mirRandom.Random(4);
     // auto rne = mirRandom.Random(mirRandom.unpredictableSeed());
-    uint angleSamples = 1_000;
-    number anglePatch = 4 * PI / double(angleSamples);
-    // auto angleGenerator = uniformVar!number(0.0, 2 * PI);
+    uint angleSamples = 1000;
+    number integrationDomain = 4 * PI;
 
     Bar progressBar = new Bar();
     progressBar.message = { return "Ray-tracing progress"; };
     progressBar.suffix = { return format("%6.2f%%\n", progressBar.percent); };
     progressBar.max = angleSamples * block.cells.length;
 
-    number expectedIntensity = block.cells[0].grey_blackbody_intensity();
-    writeln(format("Expected intensity: %.3g", expectedIntensity));
+    SimpleEstimator!(number)[] Grad;
+    Grad.length = block.cells.length;
+    // Initialise properly (we should do this inside the struct def)
+    foreach (i, ref c; Grad) {
+        c = SimpleEstimator!number(0, 0.0, 0.0);
+    }
 
     foreach (cell_id, ref origin; block.cells) {
 
-        number incidentRadiation = 0.0;
-
-        foreach (a; 0 .. angleSamples) {
-            number angle = (double(a) / double(angleSamples) + 1E-6) * 2 * PI;
-            Vector3 direction = Vector3([0.0, cos(angle), sin(angle)]);
-
+        auto directions = new Deterministic(angleSamples);
+        foreach (direction; directions) {
             size_t[] rayCells;
             number[] rayLengths;
 
-            FVInterface _ = marching_efficient(cell_id, block, direction, true, rayCells, rayLengths);
-            // FVInterface inter = marching_full(cell_id, block, direction, true, rayCells, rayLengths);
+            FVInterface _ = marching_efficient(cell_id, block, direction, cfg.axisymmetric, rayCells, rayLengths);
 
             // This is entirely contained within the ray
+            number finalIntensity = 0.0;
             number opticalDistance = 0.0;
             foreach (i; 0 .. rayCells.length) {
                 number opticalThickness = absorptionCoefficient * rayLengths[i];
-                number uniformIntensity = block.cells[rayCells[i]].grey_blackbody_intensity();
-                number exitIntensity = uniformIntensity * (1 - exp(-opticalThickness));
+                opticalDistance += opticalThickness;
+                number uniformIntensity = origin.grey_blackbody_intensity();
+                number exitIntensity = uniformIntensity;
                 number impactedIntensity = exitIntensity * exp(-opticalDistance);
                 // G = integral vec(I) dot dd(vec(Omega))
                 // vec(q) = integral vec(I) dd(Omega)
-                incidentRadiation += impactedIntensity * anglePatch;
-                opticalDistance += opticalThickness;
+                finalIntensity += impactedIntensity;
+                // Grad[rayCells[i]] += impactedIntensity;
             }
 
+            Grad[cell_id] += finalIntensity;
             progressBar.next();
         }
 
-        origin.fs.Qrad += absorptionCoefficient * incidentRadiation;
+        // origin.fs.Qrad += absorptionCoefficient * (Grad[cell_id].value() * integrationDomain);
+        // origin.fs.Qrad_var = absorptionCoefficient * (Grad[cell_id].stddev() * integrationDomain);
     }
 
     progressBar.finish();
+
+    // Write back into the block
+    foreach (i, ref c; Grad) {
+        block.cells[i].fs.Qrad += absorptionCoefficient * (c.value() * integrationDomain);
+        block.cells[i].fs.Qrad_var = absorptionCoefficient * (c.stddev() * integrationDomain);
+    }
 }
 
 struct Crossing {
@@ -253,6 +256,7 @@ FVInterface marching_efficient(
             if (!success) {
                 logger.level(logger.DEBUGGING);
                 logger.error(format("Failed at cell %s. Re-running with verbosity.", currentCell.id));
+                logger.debugging(format("Direction: %s", rayTangent));
                 logger.debugging(format("Ray: %s", ray));
                 auto _ = trace_cell(currentCell, ray, iface_id, step_length);
                 logger.level(logger.ERROR);

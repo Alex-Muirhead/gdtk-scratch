@@ -53,7 +53,7 @@ void main(string[] args) {
         .output(logger.output.std);
 
     writeln("Initial workings on a standalone radiation post-processing code.");
-    writeln(format("Absorptivity: %.2g", absorptionCoefficient));
+    logger.information(format("Absorptivity: %.2g", absorptionCoefficient));
 
     // Hard-code how many snapshots we're working with
     uint snapshotStart = 0;
